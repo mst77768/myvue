@@ -1,4 +1,4 @@
-<!--  -->
+<!-- 本页面是航次效益分析表页面 -->
 <template>
     <div class="voyage">
         <Breadcrumb>
@@ -25,6 +25,26 @@
                 </div>
             </div>
             <Seach v-if="!flag"/>
+            <div class="sumbox" v-if="!flag">
+                <span>航次总数: 100</span>
+                <span>货运总量: 100吨</span>
+                <span>平均TC: 5000美金</span>
+            </div>
+            <div class="tabbox">
+                 <Table
+                    border
+                    stripe
+                    ref="tables"
+                    :columns="columns4"
+                    :data="data1" 
+                    :height="hight"      
+                >
+                    <template slot-scope="{ row }" slot="cha">
+                        <a style="color:red" @click="golook(row)">{{row.cha}}</a>
+                        <!-- 这里是差异 -->
+                    </template>
+                </Table>
+            </div>
         </div>
     </div>
 </template>
@@ -41,14 +61,14 @@ export default {
     data() {
         //这里存放数据
         return {
-            
+            hight:0,
             week: ["51w", "52w", "53w", "54w", "55w"],
             card: 0, //默认第一
             flag: true,
             columns4: [
                 {
                     type: "selection",
-                    width: 60,
+                   
                     align: "center",
                 },
                 {
@@ -163,6 +183,9 @@ export default {
             this.data1.push(data);
         }
     },
+    mounted(){
+        this.hight=window.innerHeight/2+80;
+    }
 };
 </script>
 <style lang="less">
@@ -222,6 +245,24 @@ export default {
                     width: 80px;
                 }
             }
+        }
+        .sumbox{
+            display: flex;
+            width: 50%;
+            justify-content: space-around;
+            height: 35px;
+            align-items: center;
+            margin-top: 3px;
+            font-weight: 700;
+            font-size: 0.44rem;
+        }
+        .tabbox{
+            width: 99.5%;
+            height: auto;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 10px 10px;
+            border-radius: 6px;
         }
     }
 }

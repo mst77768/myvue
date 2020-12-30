@@ -4,7 +4,7 @@
         <div class="seachbox" >
             <div>
                 <span>船名: </span>
-                <Select v-model="model1" style="width: 120px">
+                <Select v-model="model1" style="width: 3.8rem">
                     <Option
                         v-for="item in cityList"
                         :value="item.value"
@@ -15,7 +15,7 @@
             </div>
             <div>
                 <span>航次号:</span>
-                <Select v-model="model1" style="width: 120px">
+                <Select v-model="model1" style="width: 3.8rem">
                     <Option
                         v-for="item in cityList"
                         :value="item.value"
@@ -26,7 +26,7 @@
             </div>
             <div>
                 <span>租家:</span>
-                <Select v-model="model1" style="width: 120px">
+                <Select v-model="model1" style="width: 3.8rem">
                     <Option
                         v-for="item in cityList"
                         :value="item.value"
@@ -41,7 +41,7 @@
                     v-model="value14"
                     placeholder="请输入"
                     clearable
-                    style="width: 150px"
+                    style="width: 4.54rem"
                 />
             </div>
             <div class="yue">
@@ -49,17 +49,17 @@
                 <DatePicker
                     type="date"
                     placeholder="__年__月__日"
-                    style="width: 120px"
+                    style="width: 3.6rem"
                     @on-change="fn"
                 ></DatePicker>
                 <div class="kong"></div>
                 <DatePicker
                     type="date"
                     placeholder="__年__月__日"
-                    style="width: 120px"
+                    style="width: 3.6rem"
                 ></DatePicker>
             </div>
-            <div><Button type="primary" style="width: 80px">查询</Button></div>
+            <div><Button type="primary" style="width: 2.42rem">查询</Button></div>
         </div>
     </div>
 </template>
@@ -150,7 +150,6 @@ export default {
         justify-content: space-around;
         div {
             height: 100%;
-
             display: flex;
             align-items: center;
             width: auto;

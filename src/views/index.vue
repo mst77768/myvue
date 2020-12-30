@@ -4,10 +4,11 @@
         <header>
             <img src="../assets/img/u109.png" alt="" />
         </header>
-        <!-- 头部 -->
+        <!-- 头部就是一个图片 -->
         <main>
             <div class="left">
                 <left />
+                <!-- 公共左边的侧边栏导航 -->
             </div>
             <div class="right">
                 <router-view></router-view>
@@ -15,6 +16,7 @@
                 <!-- 右边页面的占位符 -->
             </div>
         </main>
+        <!-- 底部也是一个图片 -->
         <footer></footer>
     </div>
 </template>
