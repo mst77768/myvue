@@ -89,7 +89,7 @@
                     :columns="columns4"
                     :data="data1"
                     @on-select="fn"
-                     height="500"
+                    :height="hig"
                 ></Table>
             </div>
         </div>
@@ -106,6 +106,7 @@ export default {
     data() {
         //这里存放数据
         return {
+            hig:"",
             value14: "",
             cityList: [
                 {
@@ -262,7 +263,9 @@ export default {
     },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
-    mounted() {},
+    mounted() {
+        this.hig=window.innerHeight/4
+    },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后
     beforeDestroy() {}, //生命周期 - 销毁之前
@@ -327,7 +330,7 @@ export default {
         .sumbox {
             display: flex;
             width: 95%;
-            height: 50px;
+            height: 1.5rem;
             justify-content: space-between;
             align-items: center;
             .contrleft {
@@ -341,16 +344,17 @@ export default {
                 }
             }
             .ivu-btn {
-                width: 90px;
+                width: 2.72rem;
             }
         }
         .tabbox {
             width: 99%;
             height: auto;
             margin: 0 auto;
-            padding: 10px;
+            padding: 0.33rem;
             border: 1px solid #ccc;
             border-radius: 5px;
+            
         }
     }
 }

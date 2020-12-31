@@ -3,7 +3,6 @@ import axios from "axios"
 //导入axios模块
 //封装一个ajax请求
 export default function ajax(url = "", params = {}, type = "get") {
-
     //1、定义Promise对象
     let promise
     return new Promise((resolve, reject) => {

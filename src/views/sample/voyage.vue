@@ -24,23 +24,25 @@
                     <Button type="warning" @click="updta"> 导出</Button>
                 </div>
             </div>
-            <Seach v-if="!flag"/>
+            <Seach v-if="!flag" />
             <div class="sumbox" v-if="!flag">
                 <span>航次总数: 100</span>
                 <span>货运总量: 100吨</span>
                 <span>平均TC: 5000美金</span>
             </div>
             <div class="tabbox">
-                 <Table
+                <Table
                     border
                     stripe
                     ref="tables"
                     :columns="columns4"
-                    :data="data1" 
-                    :height="hight"      
+                    :data="data1"
+                    :height="hight"
                 >
                     <template slot-scope="{ row }" slot="cha">
-                        <a style="color:red" @click="golook(row)">{{row.cha}}</a>
+                        <a style="color: red" @click="golook(row)">{{
+                            row.cha
+                        }}</a>
                         <!-- 这里是差异 -->
                     </template>
                 </Table>
@@ -52,23 +54,24 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-import Seach from "./componts/seach"
+import Seach from "./componts/seach";
+import Axios from "axios";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {
-        Seach
+        Seach,
     },
     data() {
         //这里存放数据
         return {
-            hight:0,
+            hight: 0,
             week: ["51w", "52w", "53w", "54w", "55w"],
             card: 0, //默认第一
             flag: true,
             columns4: [
                 {
                     type: "selection",
-                   
+
                     align: "center",
                 },
                 {
@@ -130,6 +133,7 @@ export default {
                     fixed: "right",
                 },
             ],
+            msg: "李四",
             data1: [
                 {
                     yue: "2020-12",
@@ -183,9 +187,16 @@ export default {
             this.data1.push(data);
         }
     },
-    mounted(){
-        this.hight=window.innerHeight/2+80;
-    }
+    mounted() {
+        this.hight = window.innerHeight / 2 + 80;
+        let obj={
+            limit:10,
+            page:2 
+        }
+        Axios.post(`http://192.168.0.101:8100/voyagemanagement/tcSummary/getTCSummary`,obj).then((route) => {
+            console.log(route.data);
+        });
+    },
 };
 </script>
 <style lang="less">
@@ -246,7 +257,7 @@ export default {
                 }
             }
         }
-        .sumbox{
+        .sumbox {
             display: flex;
             width: 50%;
             justify-content: space-around;
@@ -256,7 +267,7 @@ export default {
             font-weight: 700;
             font-size: 0.44rem;
         }
-        .tabbox{
+        .tabbox {
             width: 99.5%;
             height: auto;
             margin: 0 auto;

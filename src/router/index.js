@@ -30,6 +30,9 @@ const routes = [{
     },{
       path:"huiyi",//会议页面
       component:()=>import("../views/work/huiyi")
+    },{
+      path:"rlzz",//热力追踪页面
+      component:()=>import("../views/work/rlzz")
     }]
   },
 

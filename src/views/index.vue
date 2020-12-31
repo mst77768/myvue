@@ -75,6 +75,9 @@ li {
             .ivu-breadcrumb{
                 font-size: 0.44rem;
             }
+            .ivu-table-wrapper {
+                overflow: visible;
+            }
         }
     }
     footer {
