@@ -20,7 +20,7 @@
                     <div class="formitem">
                         <div class="inputitem">
                             <span>船名：</span>
-                            <Select v-model="model1" style="width: 150px">
+                            <Select v-model="model1" style="width: 4.54rem">
                                 <Option
                                     v-for="item in cityList"
                                     :value="item.value"
@@ -31,7 +31,7 @@
                         </div>
                         <div class="inputitem">
                             <span>航次号：</span>
-                            <Select v-model="model1" style="width: 150px">
+                            <Select v-model="model1" style="width: 4.54rem">
                                 <Option
                                     v-for="item in cityList"
                                     :value="item.value"
@@ -42,7 +42,7 @@
                         </div>
                         <div class="inputitem">
                             <span>TC预算：</span>
-                            <Select v-model="model1" style="width: 150px">
+                            <Select v-model="model1" style="width: 4.54rem">
                                 <Option
                                     v-for="item in cityList"
                                     :value="item.value"
@@ -53,7 +53,7 @@
                         </div>
                         <div class="inputitem">
                             <span>业务主管：</span>
-                            <Select v-model="model1" style="width: 150px">
+                            <Select v-model="model1" style="width: 4.54rem">
                                 <Option
                                     v-for="item in cityList"
                                     :value="item.value"
@@ -67,7 +67,7 @@
                             <DatePicker
                                 type="date"
                                 placeholder="__年__月__日"
-                                style="width: 150px"
+                                style="width: 4.54rem"
                             ></DatePicker>
                         </div>
                     </div>
@@ -78,7 +78,7 @@
                             <Input
                                 v-model="value"
                                 placeholder="请输入..."
-                                style="width: 150px"
+                                style="width: 4.54rem"
                             />
                         </div>
                         <div>
@@ -86,7 +86,7 @@
                             <Input
                                 v-model="value"
                                 placeholder="请输入..."
-                                style="width: 150px"
+                                style="width: 4.54rem"
                             />
                         </div>
                         <div>
@@ -94,7 +94,7 @@
                             <Input
                                 v-model="value"
                                 placeholder="请输入..."
-                                style="width: 150px"
+                                style="width: 4.54rem"
                             />
                         </div>
                         <div>
@@ -102,27 +102,27 @@
                             <Input
                                 v-model="value"
                                 placeholder="请输入..."
-                                style="width: 150px"
+                                style="width: 4.54rem"
                             />
                         </div>
                     </div>
                     <p>港使费信息</p>
                     <div class="gangshi">
-                        <div v-for="(item, key) in 5" :key="key">
+                        <div v-for="(item, key) in arr" :key="key">
                             <div class="flist">
-                                <span>装港{{ item }}港使费:</span>
+                                <span>装港{{ key+1 }}港使费:</span>
                                 <Input
-                                    v-model="value"
+                                    v-model="item.zgc"
                                     placeholder="请输入..."
-                                    style="width: 120px"
+                                    style="width: 3.63rem"
                                 />
                             </div>
                             <div>
-                                <span>卸港{{ item }}港使费:</span>
+                                <span>卸港{{ key+1 }}港使费:</span>
                                 <Input
-                                    v-model="value"
+                                    v-model="item.zgc"
                                     placeholder="请输入..."
-                                    style="width: 120px"
+                                    style="width: 3.63rem"
                                 />
                             </div>
                         </div>
@@ -131,7 +131,7 @@
                     <div class="qita1">
                         <div class="hhleft">
                             <b>offhire</b>
-                            <span style="margin-left: 60px">
+                            <span style="margin-left: 1.81rem">
                                 <RadioGroup v-model="phone" on-change="fn">
                                     <Radio label="true">
                                         <span>是</span>
@@ -150,7 +150,7 @@
                                     <DatePicker
                                         type="date"
                                         placeholder="__年__月__日"
-                                        style="width: 150px"
+                                        style="width: 4.54rem"
                                     ></DatePicker>
                                 </div>
                                 <div>
@@ -158,7 +158,7 @@
                                     <DatePicker
                                         type="date"
                                         placeholder="__年__月__日"
-                                        style="width: 150px"
+                                        style="width: 4.54rem"
                                     ></DatePicker>
                                 </div>
                             </div>
@@ -168,7 +168,7 @@
                                     <DatePicker
                                         type="date"
                                         placeholder="__年__月__日"
-                                        style="width: 150px"
+                                        style="width: 4.54rem"
                                     ></DatePicker>
                                 </div>
                                 <div>
@@ -176,7 +176,7 @@
                                     <DatePicker
                                         type="date"
                                         placeholder="__年__月__日"
-                                        style="width: 150px"
+                                        style="width: 4.54rem"
                                     ></DatePicker>
                                 </div>
                             </div>
@@ -185,7 +185,7 @@
                     <div class="qita1">
                         <div class="hhleft">
                             <b>营运时间加油</b>
-                            <span style="margin-left: 20px">
+                            <span style="margin-left: 0.6rem">
                                 <RadioGroup v-model="phone1" on-change="fn">
                                     <Radio label="true">
                                         <span>是</span>
@@ -204,7 +204,7 @@
                                     <DatePicker
                                         type="date"
                                         placeholder="__年__月__日"
-                                        style="width: 150px"
+                                        style="width: 4.54rem"
                                     ></DatePicker>
                                 </div>
                                 <div>
@@ -212,7 +212,7 @@
                                     <DatePicker
                                         type="date"
                                         placeholder="__年__月__日"
-                                        style="width: 150px"
+                                        style="width: 4.54rem"
                                     ></DatePicker>
                                 </div>
                             </div>
@@ -222,7 +222,7 @@
                                         >加油绕航距离:<Input
                                             v-model="value"
                                             placeholder="请输入..."
-                                            style="width: 150px"
+                                            style="width: 4.54rem"
                                     /></span>
                                 </div>
                             </div>
@@ -244,10 +244,21 @@ export default {
     data() {
         //这里存放数据
         return {
-            value: "",
+            value: "value",
+            value1:"不答复",
+            value2:"hhhhh",
             phone: "false",
             phone1: "false",
             // phone1: "true",
+            arr:[{
+                zgc:"120",//装港费
+                xgs:"23",//卸港费
+            },{
+                zgc:"13",//装港费
+                xgs:"231",//卸港费
+            }
+                
+            ],
             cityList: [
                 {
                     value: "New York",
@@ -300,7 +311,7 @@ export default {
 .TrinHousePage {
     width: 99%;
     height: 99%;
-    margin: 4px auto;
+    margin: 0.12rem auto;
     font-size: 0.42rem;
     .Trinbox {
         width: 100%;
@@ -315,53 +326,51 @@ export default {
         .boxitem {
             width: 99%;
             height: 98%;
-            margin: 8px auto;
+            margin: 0.24rem auto;
             border: 1px solid #ccc;
             .boxtop {
                 display: flex;
-                height: 40px;
+                height: 1.2rem;
                 align-items: center;
                 border-bottom: 1px solid #ccc;
                 div {
-                    margin-left: 30px;
-                    .ivu-btn {
-                        width: 60px;
-                    }
+                    margin-left: 0.9rem;
+                    
                 }
             }
             .banxin {
                 width: 98%;
                 margin: 0 auto;
-                height: 500px;
+                height: 15.1rem;
                 p {
                     border-bottom: 1px solid #ccc;
                     font-weight: 800;
                     font-size: 15px;
-                    margin-top: 30px;
+                    margin-top: 0.9rem;
                     text-indent: 6px;
-                    margin-bottom: 10px;
+                    margin-bottom: 0.33rem;
                 }
                 .teshu {
-                    margin-top: 40px;
+                    margin-top: 1.2rem;
                 }
                 .formitem {
                     width: 78%;
-                    height: 60px;
+                    height: 1.8rem;
                     display: flex;
-                    margin-left: 20px;
+                    margin-left: 0.6rem;
                     align-items: center;
                     justify-content: space-between;
                 }
                 .fenyong {
                     width: 60.8%;
-                    height: 60px;
+                    height: 1.8rem;
                     display: flex;
                     align-items: center;
-                    margin-left: 20px;
+                    margin-left: 0.6rem;
                     justify-content: space-between;
                     div {
                         span {
-                            margin-right: 6px;
+                            margin-right: 0.18rem;
                         }
                     }
                 }
@@ -369,28 +378,29 @@ export default {
                     width: 78%;
                     height: auto;
                     display: flex;
-                    margin-top: 20px;
-                    margin-left: 20px;
-                    align-content: space-around;
-                    justify-content: space-between;
+                    margin-top: 0.6rem;
+                    margin-left: 0.6rem;
+                    // align-content: space-around;
+                    // justify-content: space-between;
                     div {
+                        margin-right: 1rem;
                         .flist {
-                            margin-bottom: 20px;
+                            margin-bottom: 0.6rem;
                         }
                         div {
                             span {
-                                margin-right: 10px;
+                                margin-right: 0.3rem;
                             }
                         }
                     }
                 }
                 .qita1 {
-                    width: 1000px;
-                    height: 90px;
-                    margin-top: 30px;
+                    width: 30rem;
+                    height: 2.7rem;
+                    margin-top: 0.9rem;
                     display: flex;
                     // background-color: red;
-                    margin-left: 20px;
+                    margin-left: 0.61rem;
                     .hhleft {
                         width: 25%;
                         height: 100%;
@@ -412,7 +422,7 @@ export default {
                                 // align-items: center;
                             }
                             .ivu-date-picker {
-                                margin-left: 10px;
+                                margin-left: 0.33rem;
                             }
                         }
                     }

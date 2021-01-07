@@ -9,7 +9,7 @@
             <div class="topbox">
                 <div class="itme">
                     <b>报告类型: </b>
-                    <Select v-model="model1" style="width: 140px">
+                    <Select v-model="model1" style="width: 4.2rem">
                         <Option
                             v-for="item in cityList"
                             :value="item.value"
@@ -23,18 +23,18 @@
                     <DatePicker
                         type="date"
                         placeholder="年/月/日"
-                        style="width: 140px"
+                        style="width: 4.2rem"
                     ></DatePicker>
                     &nbsp; --&nbsp;
                     <DatePicker
                         type="date"
                         placeholder="年/月/日"
-                        style="width: 140px"
+                        style="width: 4.2rem"
                     ></DatePicker>
                 </div>
                 <div class="itme">
                     <b>报告状态: </b>
-                    <Select v-model="model2" style="width: 140px">
+                    <Select v-model="model2" style="width: 4.2rem">
                         <Option
                             v-for="item in cityList1"
                             :value="item.value"
@@ -58,7 +58,9 @@
                 <div class="table">
                     <Table  stripe :columns="columns1" :data="data1">
                         <template slot-scope="{ row }" slot="fujian">
-                            <a>{{ row.fujian }}</a>
+                             <Tooltip content="点击查看附件！"  placement="top" theme="light">
+                            <a style="font-size:16px;font-weight:800" @click="golook(row)">{{ row.fujian }}</a>
+                            </Tooltip>
                         </template>
                         <template slot-scope="{ index }" slot="action" >
                             <Tooltip content="求修改！" placement="top-start" theme="light">
@@ -68,9 +70,7 @@
                             <Tooltip content="当前状态" placement="top-start" theme="light">
                                 <Icon type="md-checkmark-circle" />
                             </Tooltip>
-                            <Tooltip content="亲！打印哦" placement="top-start" theme="light">
-                                <Icon type="md-print" @click="daochu(index)" />
-                             </Tooltip>
+                            
                         </template>
                     </Table>
                 </div>
@@ -123,19 +123,14 @@ export default {
                     title: "报告名称",
                     key: "reportname",
                     align: "center",
-                    width: "230",
+                    width: "260",
                 },
-                {
-                    title: "发布日期",
-                    key: "releasedata",
-                    align: "center",
-                     width: "146",
-                },
+               
                 {
                     title: "地点",
                     key: "address",
                     align: "center",
-                    width:120
+                    
                 },
                 {
                     title: "附件",
@@ -157,7 +152,6 @@ export default {
                     leixin: "月度会议",
                     state: "未提交",
                     reportname: "2020年12月份月度总结报告",
-                    releasedata: "2020-12-20",
                     address: "大会议室",
                     fujian: "3",
                 },
@@ -167,7 +161,6 @@ export default {
                     leixin: "月度会议",
                     state: "已提交",
                     reportname: "2020年11月份月度总结报告",
-                    releasedata: "2020-11-12",
                     address: "大会议室",
                     fujian: "3",
                 },
@@ -177,7 +170,6 @@ export default {
                     leixin: "周例会",
                     state: "未审核",
                     reportname: "安全生产周例会纪要2020W49",
-                    releasedata: "2020-12-06",
                     address: "大会议室",
                     fujian: "0",
                 },
@@ -187,7 +179,6 @@ export default {
                     leixin: "周例会",
                     state: "已审核",
                     reportname: "安全生产周例会纪要2020W48",
-                    releasedata: "2020-12-09",
                     address: "大会议室",
                     fujian: "0",
                 },
@@ -241,9 +232,11 @@ export default {
         dyin(index) {
             this.$Message.info(`打印第${index + 1}行数据`);
         },
-        daochu(index) {
-            this.$Message.info(`导出第${index + 1}行数据`);
-        },
+        
+        golook(row){
+            this.$router.push(`/readhuiyi/${row.name}`);
+        }
+
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
@@ -264,6 +257,7 @@ export default {
     height: 99%;
     margin: 4px auto;
     font-size: 0.42rem;
+   
     .tabbox {
         width: 100%;
         height: 97%;
@@ -289,8 +283,8 @@ export default {
         }
         .tablebox {
             width: 100%;
-            height: 800px;
-             border: 1px solid #ccc;
+            height: 90%;
+            border: 1px solid #ccc;
             border-radius: 5px;
             background-color: white;
             .sumbit {

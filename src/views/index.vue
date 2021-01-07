@@ -44,6 +44,7 @@ li {
 .home {
     width: 100%;
     height: 100%;
+    min-width: 1400px;
     position: relative;
     background-color: rgba(242, 242, 242, 1);
     header {

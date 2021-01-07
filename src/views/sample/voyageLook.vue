@@ -74,13 +74,14 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import Echarts from "echarts"
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
     data() {
         //这里存放数据
         return {
+            // 饼图的数据格式
             ydata: [
                 { value: 335, name: "转速" },
                 { value: 310, name: "燃油" },
@@ -88,7 +89,8 @@ export default {
                 { value: 135, name: "在港时间" },
                 { value: 1548, name: "加油" },
             ],
-            zdata: ["", 86544.4, 424444.5],
+            zdata: ["", "86544.4", "424444.5"],
+            // 竖状图的的数据格式
             columns1: [
                 {
                     title: "船名",
@@ -184,7 +186,7 @@ export default {
     //方法集合
     methods: {
         zhu() {
-            var myChart = this.$echarts.init(this.$refs.main1);
+            var myChart = Echarts.init(this.$refs.main1);
             let option = {
                 color: ["rgb(255,153,00)", "rgb(25,46,94)"],
                 title: {
@@ -249,7 +251,7 @@ export default {
             myChart.setOption(option);
         },
         yuan() {
-            var myChart = this.$echarts.init(this.$refs.main2);
+            var myChart = Echarts.init(this.$refs.main2);
             let option = {
                 color: [
                     "rgb(255,153,00)",

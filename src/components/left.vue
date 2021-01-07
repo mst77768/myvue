@@ -9,11 +9,11 @@
                 </template>
                 <Submenu name="3">
                     <template slot="title">航次分析</template>
-                    <MenuItem name="3-1" to="/">TC分析</MenuItem>
-                    <MenuItem name="3-2" to="contribution">贡献度分析</MenuItem>
                     <MenuItem name="3-3" to="voyagetable"
                         >航次效益分析</MenuItem
                     >
+                    <MenuItem name="3-2" to="contribution">贡献度分析</MenuItem>
+                    
                     <MenuItem name="3-4" to="Trintyhouse">海务列表</MenuItem>
                 </Submenu>
             </Submenu>

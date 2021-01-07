@@ -34,18 +34,34 @@
                 <Table
                     border
                     stripe
+                    :loading="loading"
                     ref="tables"
                     :columns="columns4"
                     :data="data1"
-                    :height="hight"
                 >
+                    <template slot-scope="{ row }" slot="voyageEndTime">
+                        {{ row.voyageEndTime.substring(0, 7).toString() }}
+                    </template>
                     <template slot-scope="{ row }" slot="cha">
-                        <a style="color: red" @click="golook(row)">{{
-                            row.cha
-                        }}</a>
+                        <a style="color: red" @click="golook(row)">
+                            {{ (row.actualTc - row.idealTc).toFixed(2) }}
+                        </a>
                         <!-- 这里是差异 -->
                     </template>
                 </Table>
+                <Switch v-model="loading"></Switch>
+            </div>
+            <div class="botm">
+                <Page
+                    :total="count"
+                    :page-size-opts="[6, 9, 12]"
+                    :page-size="9"
+                    show-total
+                    show-elevator
+                    show-sizer
+                    @on-change="goye"
+                    @on-page-size-change="numb"
+                />
             </div>
         </div>
     </div>
@@ -54,8 +70,9 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
+import ExportJsonExcel from "js-export-excel";
 import Seach from "./componts/seach";
-import Axios from "axios";
+import ajax from "@/api/ajax.js";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {
@@ -64,8 +81,8 @@ export default {
     data() {
         //这里存放数据
         return {
-            hight: 0,
-            week: ["51w", "52w", "53w", "54w", "55w"],
+            count: 40,
+            week: [],
             card: 0, //默认第一
             flag: true,
             columns4: [
@@ -76,82 +93,69 @@ export default {
                 },
                 {
                     title: "月份",
-                    key: "yue",
+                    key: "voyageEndTime",
+                    slot: "voyageEndTime",
                 },
                 {
                     title: "船名",
-                    key: "chaun",
+                    key: "vesselNo",
                 },
                 {
                     title: "航次号",
-                    key: "hangchihao",
+                    key: "voyageNo",
                 },
                 {
                     title: "币别",
-                    key: "bibie",
+                    key: "currency",
                 },
                 {
                     title: "船型",
-                    key: "chuanxing",
+                    key: "vesselType",
                 },
                 {
                     title: "航线",
-                    key: "hangxian",
+                    key: "route",
+                    tooltip: true,
                 },
                 {
                     title: "货品",
-                    key: "huopin",
+                    key: "cargo",
                 },
                 {
                     title: "货量",
-                    key: "huoliang",
+                    key: "volume",
                 },
                 {
                     title: "租家",
-                    key: "zhujia",
+                    key: "charterer",
+                    tooltip: true,
                 },
                 {
                     title: "运费",
-                    key: "yufei",
+                    key: "idealFreight",
                 },
                 {
                     title: "预算TC",
-                    key: "Tc",
+                    key: "budgetTc",
                 },
                 {
                     title: "理想TC",
-                    key: "lTc",
+                    key: "idealTc",
                 },
                 {
                     title: "实际TC",
-                    key: "STc",
+                    key: "actualTc",
                 },
                 {
                     title: "差异",
-                    key: "cha",
+
                     slot: "cha",
                     fixed: "right",
                 },
             ],
             msg: "李四",
-            data1: [
-                {
-                    yue: "2020-12",
-                    chaun: "DHA",
-                    hangchihao: "V2001",
-                    bibie: "RBM",
-                    chuanxing: "8K",
-                    hangxian: "A-B",
-                    huopin: "乙醇",
-                    huoliang: "4200吨",
-                    zhujia: "中海壳",
-                    yufei: "1000W",
-                    Tc: "2500",
-                    lTc: "2800",
-                    STc: "2300",
-                    cha: "-500",
-                },
-            ],
+            data1: [],
+            loading: true,
         };
     },
     //监听属性 类似于data概念
@@ -173,30 +177,89 @@ export default {
         },
         updta() {
             //导出表功能的实现
-            console.log(this.$refs.tables.exportCsv);
-            this.$refs.tables.exportCsv({
-                filename: `table-${new Date().valueOf()}.csv`,
-            });
+            const data = this.data1 ? this.data1 : ""; //表格数据
+            var option = {};
+            let dataTable = [];
+            if (data) {
+                for (let i in data) {
+                    if (data) {
+                        let obj = {
+                            "月份": data[i].voyageEndTime,
+                            "船名": data[i].vesselNo,
+                            "航次号": data[i].voyageNo,
+                            "币别": data[i].currency,
+                            "船型": data[i].vesselType,
+                            "航线": data[i].route,
+                            "货品": data[i].cargo,
+                            "货量": data[i].volume,
+                            "租家": data[i].charterer,
+                            "运费": data[i].idealFreight,
+                            "预算TC": data[i].budgetTc,
+                            "理想TC": data[i].idealTc,
+                            "实际TC": data[i].actualTc,
+                            "差异": (data[i].actualTc - data[i].idealTc).toFixed(
+                                2
+                            ),
+                        };
+                        dataTable.push(obj);
+                    }
+                }
+            }
+            option.fileName = "航次效益分析表";
+            option.datas = [
+                {
+                    sheetData: dataTable,
+                    sheetName: "sheet",
+                    sheetFilter: ["月份", "船名", "航次号","币别","船型","航线","货品","货量","租家","运费","预算TC","理想TC","实际TC","差异"],
+                    sheetHeader: ["月份", "船名", "航次号","币别","船型","航线","货品","货量","租家","运费","预算TC","理想TC","实际TC","差异"],
+                },
+            ];
+            var toExcel = new ExportJsonExcel(option); 
+            toExcel.saveExcel();
+        },
+        async getdata() {
+            //异步获取页面的数据的方法
+            let data = await ajax(
+                "/tcSummary/getTCSummary",
+                { limit: 10, page: 1, flag: 1 },
+                "post"
+            );
+            console.log(data.data.endWeek);
+            let max = data.data.endWeek;
+            console.log(max);
+            if (max < 5) {
+                console.log("afdsf");
+                for (let i = max; i >= 1; i--) {
+                    this.week.push(i + "w");
+                }
+                for (let i = 4 - max; i >= 0; i--) {
+                    this.week.push(data.data.stratWeek + i + "w");
+                }
+            } else {
+                for (let i = 1; i < 6; i++) {
+                    this.week.push(max - i + "w");
+                }
+            }
+            this.count = data.data.voyageSum;
+            this.data1 = data.data.tcSummarys;
+            console.log(data.data.tcSummarys);
+            this.loading = false;
+        },
+        goye(page) {
+            //页数切选
+            console.log(page);
+        },
+        numb(tlel) {
+            //一页几条切换事件
+            console.log(tlel);
         },
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
-        var data = this.data1[0];
-        for (let i = 0; i < 15; i++) {
-            this.data1.push(data);
-        }
+        this.getdata();
     },
-    mounted() {
-        this.hight = window.innerHeight / 2 + 80;
-        let obj={
-            limit:10,
-            page:2 
-        }
-        Axios.post(`http://192.168.0.101:8100/voyagemanagement/tcSummary/getTCSummary`,obj).then((route) => {
-            console.log(route.data);
-        });
-    },
+    mounted() {},
 };
 </script>
 <style lang="less">
@@ -205,9 +268,7 @@ export default {
     height: 99%;
     margin: 4px auto;
     // background-color: white;
-
     font-size: 0.42rem;
-
     .voyagebox {
         width: 100%;
         height: 97%;
@@ -274,6 +335,12 @@ export default {
             border: 1px solid #ccc;
             padding: 10px 10px;
             border-radius: 6px;
+        }
+        .botm {
+            display: flex;
+            justify-content: flex-end;
+            width: 94%;
+            margin-top: 1rem;
         }
     }
 }

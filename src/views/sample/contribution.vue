@@ -36,7 +36,6 @@
                             v-model="value14"
                             placeholder="请输入..."
                             clearable
-                            
                         />
                     </div>
                     <div class="nb">
@@ -246,13 +245,12 @@ export default {
             console.log(a);
         },
         updta(){
-           
             console.log(this.$refs.tables.exportCsv)
             this.$refs.tables.exportCsv({
                 filename: `table-${(new Date()).valueOf()}.csv`
             })
-        
-        }
+        },
+       
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
@@ -264,7 +262,7 @@ export default {
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
-        this.hig=window.innerHeight/4
+        this.hig=window.innerHeight/2
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后

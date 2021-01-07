@@ -195,7 +195,7 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import ajax from "@/api/ajax"
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
@@ -272,7 +272,7 @@ export default {
                     width: "550",
                 },
                 {
-                    title: "执行部门",
+                    title: "责任部门",
                     key: "execute",
                     align: "center",
                     width: "120",
@@ -402,6 +402,11 @@ export default {
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
         this.hig = window.innerHeight / 2;
+        if (!sessionStorage.getItem("data")) {
+            sessionStorage.setItem("data", JSON.stringify(this.data1));
+        }
+        
+
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后
@@ -421,9 +426,7 @@ export default {
         width: 100%;
         height: 97%;
         overflow: hidden;
-        &:hover {
-            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-        }
+
         .top {
             display: flex;
             margin-top: 0.24rem;
@@ -462,7 +465,7 @@ export default {
         }
         .tablebox1 {
             width: 100%;
-            height: 82%;
+            height: 81%;
             margin-top: 15px;
             border-radius: 8px;
             box-sizing: border-box;

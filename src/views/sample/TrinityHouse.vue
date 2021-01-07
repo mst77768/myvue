@@ -10,7 +10,10 @@
                 <div class="topxin">
                     <div>
                         <span>船名:</span>
-                        <Select v-model="model1" style="width:140px">
+                        <Select
+                            v-model="form.dhVoybebVoyage.voyageNo"
+                            style="width: 4.2rem"
+                        >
                             <Option
                                 v-for="item in cityList"
                                 :value="item.value"
@@ -21,7 +24,10 @@
                     </div>
                     <div>
                         <span>航线：</span>
-                        <Select v-model="model1" style="width:140px">
+                        <Select
+                            v-model="form.dhVoybebVoyage.route"
+                            style="width: 4.2rem"
+                        >
                             <Option
                                 v-for="item in cityList"
                                 :value="item.value"
@@ -33,10 +39,10 @@
                     <div>
                         <span>海务主管：</span>
                         <Input
-                            v-model="value14"
+                            v-model="form.dhVoybebVoyage.maritimeOfficer"
                             placeholder="请输入..."
                             clearable
-                           
+                            style="width: 4.2rem"
                         />
                     </div>
                     <div class="yue">
@@ -44,18 +50,20 @@
                         <DatePicker
                             type="date"
                             placeholder="__年__月__日"
-                            style="width:140px"
+                            style="width: 4.2rem"
+                            @on-change="start"
                         ></DatePicker>
                         <div class="kong"></div>
                         <DatePicker
                             type="date"
                             placeholder="__年__月__日"
-                            style="width:140px"
+                            style="width: 4.2rem"
+                            @on-change="end"
                         ></DatePicker>
                     </div>
                     <div>
-                        <Button type="primary">查询</Button>
-                         <div class="kong"></div>
+                        <Button type="primary" @click="seach">查询</Button>
+                        <div class="kong"></div>
                         <Button type="warning" class="btn" @click="updta"
                             >导出</Button
                         >
@@ -63,19 +71,34 @@
                 </div>
             </div>
             <div class="tablebox">
-                   <Table
-                   
+                <Table
                     border
                     :columns="columns2"
                     :data="data3"
                     :height="hig"
                     ref="tables"
                 >
-                    <template slot-scope="{ row }" slot="hch">
-                        <a style="color: red" @click="goupdate(row.hch)">{{
-                            row.hch
-                        }}</a>
+                    <template slot-scope="{ row }" slot="updateTime">
+                        <span v-if="row.updateTime">
+                            {{ row.updateTime.substring(0, 7) }}
+                        </span>
+                        <span v-else> </span>
+
+                        <!-- 这里是显示月份的 -->
+                    </template>
+                    <template slot-scope="{ row }" slot="voyageNo">
+                        <a style="color: red" @click="goupdate(row.voyageNo)">
+                            {{ row.voyageNo }}</a
+                        >
                         <!-- 这里是差异 -->
+                    </template>
+                    <template slot-scope="{ row }" slot="zg1">
+                        {{ row.zg1.portName }}
+                        <!-- 这里是显示月份的 -->
+                    </template>
+                    <template slot-scope="{ row }" slot="xg1">
+                        {{ row.xg1.portName }}
+                        <!-- 这里是显示月份的 -->
                     </template>
                 </Table>
             </div>
@@ -86,15 +109,27 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import ajax from "@/api/ajax.js";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
     data() {
         //这里存放数据
         return {
-            hig:"",
-            value14: "无休波",
+            hig: "", //表格的高度
+            form: {
+                //表单的数据双向数据绑定
+                dhVoybebVoyage: {
+                    voyageNo: "",
+                    route: "",
+                    maritimeOfficer: "",
+                },
+                startTime: "",
+                endTime: "",
+                limit:10,
+                page:1
+               
+            },
             cityList: [
                 {
                     value: "New York",
@@ -121,52 +156,51 @@ export default {
                     label: "Canberra",
                 },
             ],
-            model1: "",
             columns2: [
                 {
                     title: "月份",
-                    key: "yue",
+                    slot: "updateTime",
                     width: 130,
                 },
                 {
                     title: "船名",
-                    key: "cm",
+                    key: "vesselNo",
                     width: 100,
                 },
                 {
                     title: "航次号",
-                    key: "hch",
+                    slot: "voyageNo",
                     width: 100,
-                    slot: "hch",
+                    // slot: "voyageNo",
                 },
                 {
                     title: "预算TC",
-                    key: "ystc",
+                    key: "budgetTc",
                     width: 100,
                 },
                 {
                     title: "业务主管",
-                    key: "ywzg",
+                    key: "salesManager",
                     width: 100,
                 },
                 {
                     title: "运费",
-                    key: "yf",
+                    key: "freight",
                     width: 100,
                 },
                 {
                     title: "滞期费",
-                    key: "zq",
+                    key: "demurrage",
                     width: 100,
                 },
                 {
                     title: "佣金比例",
-                    key: "yj",
+                    key: "commissionRatio",
                     width: 100,
                 },
                 {
                     title: "其他费用",
-                    key: "qt",
+                    key: "otherMoney",
                     width: 100,
                 },
                 {
@@ -221,12 +255,12 @@ export default {
                 },
                 {
                     title: "offhire开始时间",
-                    key: "offstart",
+                    key: "offhireStartTime",
                     width: 140,
                 },
                 {
                     title: "offhire结束时间",
-                    key: "offend",
+                    key: "offhireEndTime",
                     width: 140,
                 },
                 {
@@ -236,17 +270,17 @@ export default {
                 },
                 {
                     title: "间接offhire结束时间",
-                    key: "jjoffend",
+                    key: "indirectOffhireStartTime",
                     width: 170,
                 },
                 {
                     title: "营运时间加油船舶抵达锚地时间",
-                    key: "mdsj",
+                    key: "droppedAnchor",
                     width: 150,
                 },
                 {
                     title: "营运时间加油结束时间",
-                    key: "jssj",
+                    key: "refuelingShipEndTime",
                     width: 130,
                 },
                 {
@@ -256,35 +290,12 @@ export default {
                 },
                 {
                     title: "创建时间",
-                    key: "cjsj",
+                    key: "createTime",
                     width: 110,
                 },
             ],
-            data3: [
-                {
-                    yue: "2020-11",
-                    cm: "DH1",
-                    hch: "V2001",
-                    ystc: "3500",
-                    ywzg: "严谨",
-                    yf: "2960",
-                    zq: "1200",
-                    yj: "0.5",
-                    qt: "1500",
-                    zg1: "500",
-                    xg1: "",
-                    zg2: "",
-                    xg2: "520",
-                    zg3: "",
-                    xg3: "",
-                    zg4: "",
-                    xg4: "",
-                    zg5: "",
-                    xg5: "",
-                },
-            ],
+            data3: [], //该数组用于存放表格数据
         };
-        
     },
     //监听属性 类似于data概念
     computed: {},
@@ -292,26 +303,75 @@ export default {
     watch: {},
     //方法集合
     methods: {
-         goupdate(a) {
-            console.log(a);
-            this.$router.push("TrinHousePage")
+        start(date) {
+            //获取开始的时间
+            this.form.startTime = date;
         },
-         updta(){
-
-            console.log(this.$refs.tables.exportCsv)
+        end(date) {
+            //获取结束的时间
+            this.form.endTime = date;
+            console.log(this.form);
+        },
+        goupdate(a) {
+            //用于路由跳转页面
+            console.log(a);
+            this.$router.push("TrinHousePage");
+        },
+        updta() {
+            //该方法用于打印表格数据
+            console.log(this.$refs.tables.exportCsv);
             this.$refs.tables.exportCsv({
-                filename: `table-${(new Date()).valueOf()}.csv`
-            })
-        
+                filename: `table-${new Date().valueOf()}.csv`,
+            });
+        },
+        async getdata(form) {
+            //该方法用于请求数据
+            let data = "";
+            if (form) {
+                data = await ajax(
+                    "/dhVoybebHwsr/getDhVoybebHwsr",
+                     form,
+                    "post"
+                );
+            } else {
+                data = await ajax(
+                    "/dhVoybebHwsr/getDhVoybebHwsr",
+                    {
+                        //请求接口并返回数据
+                        page: 1,
+                        limit: 10,
+                    },
+                    "post"
+                );
+            }
+
+            console.log(data);
+            let arr = data.data.dhVoybebHwsrList;
+            for (let i = 0; i < arr.length; i++) {
+                //该方法把数据特殊处理一下
+                let item = arr[i].dhVoybebPortChargeMap;
+                for (let key in item) {
+                    arr[i][key] =
+                        item[key].portName + "(" + item[key].portCharge + ")";
+                }
+            }
+            console.log(arr);
+            this.data3 = arr; //将请求的数据赋值给data3变量
+        },
+        seach(){
+            this.getdata(this.form)
         }
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
-    created() {},
+    created() {
+        this.getdata(); //请求数据
+    },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
-        this.hig=window.innerHeight/3*2
+        this.hig = (window.innerHeight / 3) * 2;
+        console.log(new Date())
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后
@@ -348,15 +408,15 @@ export default {
                 display: flex;
                 align-items: center;
                 justify-content: space-around;
-                div{
+                div {
                     width: auto;
                     display: flex;
                     align-items: center;
-                    span{
+                    span {
                         white-space: nowrap;
                         margin-right: 0.2rem;
                     }
-                    .kong{
+                    .kong {
                         width: 0.3rem;
                     }
                     .ivu-btn {
@@ -364,10 +424,9 @@ export default {
                         width: 2.5rem;
                     }
                 }
-                
             }
         }
-        .tablebox{
+        .tablebox {
             width: 99%;
             height: auto;
             margin: 0.8rem auto;

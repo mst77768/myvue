@@ -1,4 +1,9 @@
 import axios from "axios"
+//导入axios
+
+// 配置请求的基准URL地址
+axios.defaults.baseURL = 'http://192.168.0.101:8100/voyagemanagement'
+// axios设置请求拦截器,设置响应头token
 
 //导入axios模块
 //封装一个ajax请求
