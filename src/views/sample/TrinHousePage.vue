@@ -12,7 +12,7 @@
                         <Button type="warning">编辑</Button>
                     </div>
                     <div class="itme2">
-                        <Button type="primary">提交</Button>
+                        <Button type="primary" @click="getpagedata">提交</Button>
                     </div>
                 </div>
                 <div class="banxin">
@@ -20,40 +20,34 @@
                     <div class="formitem">
                         <div class="inputitem">
                             <span>船名：</span>
-                            <Select v-model="model1" style="width: 4.54rem">
-                                <Option
-                                    v-for="item in cityList"
-                                    :value="item.value"
-                                    :key="item.value"
-                                    >{{ item.label }}</Option
-                                >
+                            <Select
+                                v-model="form.vesselNo"
+                                style="width: 4.54rem"
+                            >
                             </Select>
                         </div>
                         <div class="inputitem">
                             <span>航次号：</span>
-                            <Select v-model="model1" style="width: 4.54rem">
-                                <Option
-                                    v-for="item in cityList"
-                                    :value="item.value"
-                                    :key="item.value"
-                                    >{{ item.label }}</Option
-                                >
+                            <Select
+                                v-model="form.voyageNo"
+                                style="width: 4.54rem"
+                            >
                             </Select>
                         </div>
                         <div class="inputitem">
                             <span>TC预算：</span>
-                            <Select v-model="model1" style="width: 4.54rem">
-                                <Option
-                                    v-for="item in cityList"
-                                    :value="item.value"
-                                    :key="item.value"
-                                    >{{ item.label }}</Option
-                                >
-                            </Select>
+                            <Input
+                                v-model="form.budgetTc"
+                                placeholder="请输入..."
+                                style="width: 4.54rem"
+                            />
                         </div>
                         <div class="inputitem">
                             <span>业务主管：</span>
-                            <Select v-model="model1" style="width: 4.54rem">
+                            <Select
+                                v-model="form.salesManager"
+                                style="width: 4.54rem"
+                            >
                                 <Option
                                     v-for="item in cityList"
                                     :value="item.value"
@@ -62,21 +56,21 @@
                                 >
                             </Select>
                         </div>
-                        <div class="inputitem">
+                        <!-- <div class="inputitem">
                             <span>填报日期：</span>
                             <DatePicker
                                 type="date"
                                 placeholder="__年__月__日"
                                 style="width: 4.54rem"
                             ></DatePicker>
-                        </div>
+                        </div> -->
                     </div>
                     <p>费用信息</p>
                     <div class="fenyong">
                         <div>
                             <span>运费：</span>
                             <Input
-                                v-model="value"
+                                v-model="form.freight"
                                 placeholder="请输入..."
                                 style="width: 4.54rem"
                             />
@@ -84,7 +78,7 @@
                         <div>
                             <span>滞期费:</span>
                             <Input
-                                v-model="value"
+                                v-model="form.demurrage"
                                 placeholder="请输入..."
                                 style="width: 4.54rem"
                             />
@@ -92,7 +86,7 @@
                         <div>
                             <span>佣金比例:</span>
                             <Input
-                                v-model="value"
+                                v-model="form.commissionRatio"
                                 placeholder="请输入..."
                                 style="width: 4.54rem"
                             />
@@ -100,7 +94,7 @@
                         <div>
                             <span>其他费用:</span>
                             <Input
-                                v-model="value"
+                                v-model="form.otherMoney"
                                 placeholder="请输入..."
                                 style="width: 4.54rem"
                             />
@@ -108,25 +102,32 @@
                     </div>
                     <p>港使费信息</p>
                     <div class="gangshi">
-                        <div v-for="(item, key) in arr" :key="key">
-                            <div class="flist">
-                                <span>装港{{ key+1 }}港使费:</span>
-                                <Input
-                                    v-model="item.zgc"
-                                    placeholder="请输入..."
-                                    style="width: 3.63rem"
-                                />
+                        <div class="bb">
+                            <div v-for="(item, key) in form.dhVoybebPortCharges" :key="key">
+                                <div class="flist" v-if="!item.assignmentStyle">
+                                    <span>装港{{ item.portName }}港使费:</span>
+                                    <Input
+                                        v-model="item.portCharge"
+                                        placeholder="请输入..."
+                                        style="width: 4rem"
+                                    />
+                                </div>
                             </div>
-                            <div>
-                                <span>卸港{{ key+1 }}港使费:</span>
-                                <Input
-                                    v-model="item.zgc"
-                                    placeholder="请输入..."
-                                    style="width: 3.63rem"
-                                />
+                        </div>
+                        <div class="bb">
+                            <div v-for="(item, key) in form.dhVoybebPortCharges" :key="key">
+                                <div class="flist" v-if="item.assignmentStyle">
+                                    <span>卸港{{ item.portName }}港使费:</span>
+                                    <Input
+                                        v-model="item.portCharge"
+                                        placeholder="请输入..."
+                                        style="width: 4rem"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
+
                     <p class="teshu">其他信息</p>
                     <div class="qita1">
                         <div class="hhleft">
@@ -149,6 +150,7 @@
                                     <span>offhire开始时间:</span>
                                     <DatePicker
                                         type="date"
+                                        :value="form.offhireStartTime"
                                         placeholder="__年__月__日"
                                         style="width: 4.54rem"
                                     ></DatePicker>
@@ -157,6 +159,7 @@
                                     <span>offhire结束时间:</span>
                                     <DatePicker
                                         type="date"
+                                        :value="form.offhireEndTime"
                                         placeholder="__年__月__日"
                                         style="width: 4.54rem"
                                     ></DatePicker>
@@ -167,6 +170,7 @@
                                     <span>间接offhire开始时间:</span>
                                     <DatePicker
                                         type="date"
+                                        :value="form.indirectOffhireStartTime"
                                         placeholder="__年__月__日"
                                         style="width: 4.54rem"
                                     ></DatePicker>
@@ -175,6 +179,7 @@
                                     <span>间接offhire结束时间:</span>
                                     <DatePicker
                                         type="date"
+                                        :value="form.indirectOffhireStartTime"
                                         placeholder="__年__月__日"
                                         style="width: 4.54rem"
                                     ></DatePicker>
@@ -203,6 +208,7 @@
                                     <span>营运时间加油船舶抵达锚地时间:</span>
                                     <DatePicker
                                         type="date"
+                                        :value="form.droppedAnchor"
                                         placeholder="__年__月__日"
                                         style="width: 4.54rem"
                                     ></DatePicker>
@@ -211,6 +217,7 @@
                                     <span>营运时间加油结束时间:</span>
                                     <DatePicker
                                         type="date"
+                                        :value="form.refuelingShipEndTime"
                                         placeholder="__年__月__日"
                                         style="width: 4.54rem"
                                     ></DatePicker>
@@ -220,7 +227,7 @@
                                 <div>
                                     <span style="white-space: nowrap"
                                         >加油绕航距离:<Input
-                                            v-model="value"
+                                            v-model="form.rgDistance"
                                             placeholder="请输入..."
                                             style="width: 4.54rem"
                                     /></span>
@@ -237,54 +244,18 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import ajax from "@/api/ajax.js"
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
     data() {
         //这里存放数据
         return {
-            value: "value",
-            value1:"不答复",
-            value2:"hhhhh",
+            form: {},
             phone: "false",
             phone1: "false",
-            // phone1: "true",
-            arr:[{
-                zgc:"120",//装港费
-                xgs:"23",//卸港费
-            },{
-                zgc:"13",//装港费
-                xgs:"231",//卸港费
-            }
-                
-            ],
-            cityList: [
-                {
-                    value: "New York",
-                    label: "New York",
-                },
-                {
-                    value: "London",
-                    label: "London",
-                },
-                {
-                    value: "Sydney",
-                    label: "Sydney",
-                },
-                {
-                    value: "Ottawa",
-                    label: "Ottawa",
-                },
-                {
-                    value: "Paris",
-                    label: "Paris",
-                },
-                {
-                    value: "Canberra",
-                    label: "Canberra",
-                },
-            ],
+            
+            cityList: [],
             model1: "",
         };
     },
@@ -293,10 +264,18 @@ export default {
     //监控data中的数据变化
     watch: {},
     //方法集合
-    methods: {},
+    methods: {
+        getpagedata() {
+               ajax("/dhVoybebHwsr/submitDhVoybebHwsr",this.form,"post").then(data=>{
+                   console.log(data)
+               })
+        },
+    },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
-    created() {},
+    created() {
+        this.form = JSON.parse(sessionStorage.getItem("haiwu"));
+    },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {},
@@ -335,7 +314,6 @@ export default {
                 border-bottom: 1px solid #ccc;
                 div {
                     margin-left: 0.9rem;
-                    
                 }
             }
             .banxin {
@@ -380,16 +358,26 @@ export default {
                     display: flex;
                     margin-top: 0.6rem;
                     margin-left: 0.6rem;
+                    align-content: center;
+                    flex-wrap: wrap;
                     // align-content: space-around;
                     // justify-content: space-between;
+                    .bb {
+                        // width: 100%;
+                        // height: 1.5rem;
+                        // display: flex;
+                        // justify-content: space-around;
+                        width: 100%;
+                    }
                     div {
-                        margin-right: 1rem;
+                        
                         .flist {
-                            margin-bottom: 0.6rem;
+                            margin-right: 3rem;
+                            margin-bottom: 1rem;
                         }
                         div {
                             span {
-                                margin-right: 0.3rem;
+                               margin-right: 0.5rem;
                             }
                         }
                     }

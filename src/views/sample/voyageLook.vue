@@ -74,7 +74,8 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-import Echarts from "echarts"
+import ajax from "@/api/ajax.js";
+import Echarts from "echarts";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
@@ -82,101 +83,80 @@ export default {
         //这里存放数据
         return {
             // 饼图的数据格式
-            ydata: [
-                { value: 335, name: "转速" },
-                { value: 310, name: "燃油" },
-                { value: 234, name: "卸货速度" },
-                { value: 135, name: "在港时间" },
-                { value: 1548, name: "加油" },
-            ],
-            zdata: ["", "86544.4", "424444.5"],
+            ydata: [],
+            zdata: [],
             // 竖状图的的数据格式
             columns1: [
                 {
                     title: "船名",
-                    key: "chaun",
+                    key: "vesselNo",
                 },
                 {
                     title: "航次号",
-                    key: "hangchihao",
+                    key: "voyageNo",
                 },
                 {
                     title: "航线",
-                    key: "hangxian",
+                    key: "route",
+                    tooltip:true
                 },
                 {
                     title: "币别",
-                    key: "bibie",
+                    key: "currency",
                 },
                 {
                     title: "理想TC",
-                    key: "lTc",
+                    key: "idealTc",
+                    tooltip:true
                 },
                 {
                     title: "实际TC",
-                    key: "STc",
+                    key: "actualTc",
+                    tooltip:true
                 },
                 {
                     title: "速度影响-转速",
-                    key: "zhuan",
+                    key: "rotationalSpeedOffhire",
                     width:"130"
                 },
                 {
                     title: "速度影响-天气",
-                    key: "tianq",
+                    key: "weatherOffhire",
                     width:"130"
                 },
                 {
                     title: "卸货速度",
-                    key: "xiehuo",
+                    key: "dischargeCargoSpeedOffhire",
                     width:"110"
                 },
                 {
                     title: "在港时间",
-                    key: "zaige",
+                    key: "atportDateOffhire",
                      width:"100"
                 },
                 {
                     title: "吃水",
-                    key: "cw",
+                    key: "draftOffhire",
                 },
                 {
                     title: "燃油",
-                    key: "ry",
+                    key: "fueloilOffhire",
                 },
                 {
                     title: "加油",
-                    key: "jy",
+                    key: "addOilOffhire",
                 },
                 {
                     title: "offhire",
-                    key: "offhire",
+                    key: "offhireOffhireExplanation",
                 },
                 {
                     title: "间接offhire",
-                    key: "joff",
+                    key: "indirectOffhireOffhire",
                     width:"110"
                 },
             ],
-            data1: [
-                {
-                    chaun: "DHA",
-                    hangchihao: "V2001",
-                    hangxian: "A-B",
-                    bibie: "RBM",
-                    lTc: "2500",
-                    STc: "2690",
-                    zhuan: "100%",
-                    tianq: "100%",
-                    xiehuo: "100%",
-                    zaige: "100%",
-                    cw: "100%",
-                    ry: "100%",
-                    jy: "100%",
-                    offhire: "100%",
-                    joff: "100%",
-                },
-            ],
+            data1: [],
         };
     },
     //监听属性 类似于data概念
@@ -201,7 +181,6 @@ export default {
                 yAxis: {
                     show: false,
                 },
-
                 series: [
                     {
                         type: "bar",
@@ -308,15 +287,32 @@ export default {
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
-    created() {},
+    created() {
+        
+        
+        
+    },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
-        this.zhu();
-        this.yuan();
-        for(let i=0;i<2;i++){
-            this.data1.push(this.data1[0])
-        }
+       
+        let obj=JSON.parse(localStorage.getItem("id"))
+        console.log(obj.vesselNo)
+        console.log(obj.voyageNo)
+        this.zdata=["",obj.idealTc,obj.actualTc]
+        
+         this.zhu();
+        ajax("/tcSummary/getTCSummaryDetail",{
+           vesselNo:obj.vesselNo,
+           voyageNo:obj.voyageNo
+        },"post").then(data=>{ 
+           let arr=data.data.bzt;
+           this.data1.push(Object.assign(data.data.contributionSummary,obj))
+           this.ydata=arr
+           console.log(data)
+            this.yuan();
+        })
+
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后

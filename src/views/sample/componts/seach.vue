@@ -47,14 +47,14 @@
             <div class="yue">
                 <span>月份范围:</span>
                 <DatePicker
-                    type="date"
+                    type="month"
                     placeholder="__年__月__日"
                     style="width: 3.6rem"
                     @on-change="fn"
                 ></DatePicker>
                 <div class="kong"></div>
                 <DatePicker
-                    type="date"
+                    type="month"
                     placeholder="__年__月__日"
                     style="width: 3.6rem"
                 ></DatePicker>

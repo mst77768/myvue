@@ -87,7 +87,7 @@
                         <!-- 这里是显示月份的 -->
                     </template>
                     <template slot-scope="{ row }" slot="voyageNo">
-                        <a style="color: red" @click="goupdate(row.voyageNo)">
+                        <a style="color: red" @click="goupdate(row)">
                             {{ row.voyageNo }}</a
                         >
                         <!-- 这里是差异 -->
@@ -126,9 +126,8 @@ export default {
                 },
                 startTime: "",
                 endTime: "",
-                limit:10,
-                page:1
-               
+                limit: 10,
+                page: 1,
             },
             cityList: [
                 {
@@ -265,7 +264,7 @@ export default {
                 },
                 {
                     title: "间接offhire开始时间",
-                    key: "jjoffstart",
+                    key: "indirectOffhireStartTime",
                     width: 170,
                 },
                 {
@@ -285,7 +284,7 @@ export default {
                 },
                 {
                     title: "加油绕航距离",
-                    key: "jyrhjl",
+                    key: "rgDistance",
                     width: 130,
                 },
                 {
@@ -312,9 +311,10 @@ export default {
             this.form.endTime = date;
             console.log(this.form);
         },
-        goupdate(a) {
+        goupdate(row) {
             //用于路由跳转页面
-            console.log(a);
+            console.log(row);
+            sessionStorage.setItem("haiwu",JSON.stringify(row))
             this.$router.push("TrinHousePage");
         },
         updta() {
@@ -330,7 +330,7 @@ export default {
             if (form) {
                 data = await ajax(
                     "/dhVoybebHwsr/getDhVoybebHwsr",
-                     form,
+                    form,
                     "post"
                 );
             } else {
@@ -358,9 +358,9 @@ export default {
             console.log(arr);
             this.data3 = arr; //将请求的数据赋值给data3变量
         },
-        seach(){
-            this.getdata(this.form)
-        }
+        seach() {
+            this.getdata(this.form);
+        },
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
@@ -371,7 +371,12 @@ export default {
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
         this.hig = (window.innerHeight / 3) * 2;
-        console.log(new Date())
+        console.log(new Date());
+        if (sessionStorage.getItem("route")) {//请求航次等下啦框的数据
+            ajax("/common/getSelect", {}, "get").then((data) => {
+                sessionStorage("route", JSON.stringify(data.data.route));
+            });
+        }
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后

@@ -1,5 +1,5 @@
 <template>
-    <div id="app">
+    <div id="app" >
         <router-view />
     </div>
 </template>
@@ -14,7 +14,7 @@
 html,
 body {
     .size;
-    overflow: hidden;
+     overflow: hidden;
     margin: 0;
     padding: 0;
    

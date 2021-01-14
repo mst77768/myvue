@@ -55,7 +55,7 @@
                 <Page
                     :total="count"
                     :page-size-opts="[6, 9, 12]"
-                    :page-size="9"
+                    :page-size="limit"
                     show-total
                     show-elevator
                     show-sizer
@@ -81,10 +81,11 @@ export default {
     data() {
         //这里存放数据
         return {
-            count: 40,
-            week: [],
+            count: 0,
+            limit:9,
+            week: [],//用于存放周
             card: 0, //默认第一
-            flag: true,
+            flag: true,//状态控制
             columns4: [
                 {
                     type: "selection",
@@ -148,13 +149,11 @@ export default {
                 },
                 {
                     title: "差异",
-
                     slot: "cha",
                     fixed: "right",
                 },
             ],
-            msg: "李四",
-            data1: [],
+            data1: [],//这里用于存放表格的数据也就是请求回来的数据
             loading: true,
         };
     },
@@ -221,10 +220,10 @@ export default {
             //异步获取页面的数据的方法
             let data = await ajax(
                 "/tcSummary/getTCSummary",
-                { limit: 10, page: 1, flag: 1 },
+                { limit: this.limit, page: 1, flag: 1 },
                 "post"
             );
-            console.log(data.data.endWeek);
+            console.log(data);
             let max = data.data.endWeek;
             console.log(max);
             if (max < 5) {
@@ -245,13 +244,26 @@ export default {
             console.log(data.data.tcSummarys);
             this.loading = false;
         },
+       async pagedata(limit,page=1,){
+            this.loading=true;
+            let data=await ajax("/tcSummary/getTCSummary",{
+                limit,page
+            },"post");
+
+            console.log(data);
+            this.data1=data.data.tcSummarys
+            this.loading=false
+
+        },
         goye(page) {
             //页数切选
-            console.log(page);
+           this.pagedata(this.limit,page)
         },
         numb(tlel) {
             //一页几条切换事件
             console.log(tlel);
+            this.limit=tlel;
+            this.pagedata(this.limit,1)
         },
     },
     beforeCreate() {}, //生命周期 - 创建之前
@@ -259,7 +271,11 @@ export default {
     created() {
         this.getdata();
     },
-    mounted() {},
+    mounted() {
+        ajax("/common/getSelect",{},"get").then(data=>{
+            console.log(data)
+        })
+    },
 };
 </script>
 <style lang="less">

@@ -44,7 +44,6 @@
                             v-model="value14"
                             placeholder="请输入..."
                             clearable
-                            
                         />
                     </div>
                     <div class="nb">
@@ -59,15 +58,13 @@
                     <div class="nb">
                         <span> 月份范围: </span>
                         <DatePicker
-                            type="date"
-                            placeholder="__年__月__日"
-                           
+                            type="month"
+                            placeholder="__年__月"
                         ></DatePicker>
-                        <span class="kong"></span>
+                        <span class="kong">~</span>
                         <DatePicker
-                            type="date"
-                            placeholder="__年__月__日"
-                            
+                            type="month"
+                            placeholder="__年__月"
                         ></DatePicker>
                         <Button type="primary">查询</Button>
                     </div>
@@ -82,14 +79,30 @@
                 <div><Button type="warning" @click="updta">导出</Button></div>
             </div>
             <div class="tabbox">
-                 <Table
+                <Table
                     border
                     ref="tables"
                     :columns="columns4"
                     :data="data1"
                     @on-select="fn"
                     :height="hig"
-                ></Table>
+                >
+                 <template slot-scope="{ row, index }" slot="voyageEndTime">
+                  <span>{{row.voyageEndTime.substring(0,7)}}</span>
+        </template>
+                </Table>
+                <div class="botm">
+                    <Page
+                        :total="count"
+                        :page-size-opts="[6, 9, 12]"
+                        :page-size="limit"
+                        show-total
+                        show-elevator
+                        show-sizer
+                        @on-change="goye"
+                        @on-page-size-change="numb"
+                    />
+                </div>
             </div>
         </div>
     </div>
@@ -98,14 +111,17 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import ExportJsonExcel from "js-export-excel";
+import ajax from "@/api/ajax.js";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
     data() {
         //这里存放数据
         return {
-            hig:"",
+            hig: "",
+            limit:6,
+            count:40,
             value14: "",
             cityList: [
                 {
@@ -142,97 +158,79 @@ export default {
                 },
                 {
                     title: "月份",
-                    key: "yue",
-                    width:90,
+                    slot: "voyageEndTime",
+                    width: 90,
                 },
                 {
                     title: "船名",
-                    key: "cm",
+                    key: "vesselNo",
                 },
                 {
                     title: "航次号",
-                    key: "hch",
+                    key: "voyageNo",
                 },
                 {
                     title: "航线",
-                    key: "hx",
+                    key: "route",
+                    tooltip: true,
                 },
                 {
                     title: "币种",
-                    key: "bz",
+                    key: "currency",
                 },
                 {
                     title: "理想TC",
-                    key: "lxtc",
+                    key: "idealTc",
                 },
                 {
                     title: "实际TC",
-                    key: "sjtc",
+                    key: "actualTc",
+                    tooltip: true,
                 },
                 {
                     title: "速度影响-转速",
-                    width:130,
-                    key: "sdzs",
+                    width: 130,
+                    key: "rotationalSpeedOffhire",
                 },
                 {
                     title: "速度影响-天气",
-                    
-                    key: "sdtq",
-                    width:130
+
+                    key: "weatherOffhire",
+                    width: 130,
                 },
                 {
                     title: "卸货速度",
-                    key: "xhsd",
-                    width:120,
+                    key: "dischargeCargoSpeedOffhire",
+                    width: 120,
                 },
                 {
                     title: "在港时间",
-                    key: "zgsj",
-                    width:120,
+                    key: "atportDateOffhire",
+                    width: 120,
                 },
                 {
                     title: "吃水",
-                    key: "cs",
+                    key: "draftOffhire",
                 },
                 {
                     title: "燃油",
-                    key: "ry",
+                    key: "fueloilOffhire",
                 },
                 {
-                    title:"加油",
-                    key:"jy"
+                    title: "加油",
+                    key: "addOilOffhire",
                 },
                 {
-                    title:"offhire",
-                    key:"off"
+                    title: "offhire",
+                    key: "offhireOffhireExplanation",
                 },
                 {
-                    title:"间接offhire",
-                    width:110,
-                    key:"jjoff"
-                }
-
+                    title: "间接offhire",
+                    width: 110,
+                    key: "indirectOffhireOffhire",
+                },
             ],
-            data1: [
-                {
-                    yue: "2020-12",
-                    cm: "DHA",
-                    hch: "V2001",
-                    hx: "RBM",
-                    bz:"8K",
-                    lxtc:"A-B",
-                    sjtc:"乙醇",
-                    sdzs:"4200吨",
-                    sdtq:"中海壳",
-                    xhsd:"1000W",
-                    zgsj:"2500",
-                    cs:"2800",
-                    ry:"2300",
-                    jy:"-500",
-                    off:"",
-                    jjoff:""
-                }  
-            ],
+            data1: [],
         };
     },
     //监听属性 类似于data概念
@@ -241,28 +239,82 @@ export default {
     watch: {},
     //方法集合
     methods: {
-         fn(a) {
+        fn(a) {
             console.log(a);
         },
-        updta(){
-            console.log(this.$refs.tables.exportCsv)
-            this.$refs.tables.exportCsv({
-                filename: `table-${(new Date()).valueOf()}.csv`
-            })
+        updta() {
+            const data = this.data1 ? this.data1 : ""; //表格数据
+            var option = {};
+            let dataTable = [];
+            if (data) {
+                for (let i in data) {
+                    if (data) {
+                        let obj = {
+                            "月份": data[i].voyageEndTime,
+                            "船名": data[i].vesselNo,
+                            "航次号": data[i].voyageNo,
+                            "航线": data[i].route,
+                            "币种":data[i].currency,
+                            "预算TC": data[i].budgetTc,
+                            "理想TC": data[i].idealTc,
+                            "实际TC": data[i].actualTc,
+                            "速度影响-转速":data[i].rotationalSpeedOffhire,
+                            "速度影响-天气":data[i].weatherOffhire,
+                            "卸货速度":data[i].dischargeCargoSpeedOffhire,
+                            "在港时间":data[i].atportDateOffhire,
+                            "吃水":data[i].draftOffhire,
+                            "燃油":data[i].fueloilOffhire,
+                            "加油":data[i].addOilOffhire,
+                            "offhire":data[i].offhireOffhireExplanation,
+                            "间接offhire":data[i].indirectOffhireOffhire
+                            
+                        };
+                        dataTable.push(obj);
+                    }
+                }
+            }
+            option.fileName = "航次效益分析表";
+            option.datas = [
+                {
+                    sheetData: dataTable,
+                    sheetName: "sheet",
+                    sheetFilter: ["月份", "船名", "航次号","航线","币种","理想TC","实际TC","速度影响-转速","速度影响-天气","卸货速度","在港时间","吃水","燃油","加油","offhire","间接offhire"],
+                    sheetHeader: ["月份", "船名", "航次号","航线","币种","理想TC","实际TC","速度影响-转速","速度影响-天气","卸货速度","在港时间","吃水","燃油","加油","offhire","间接offhire"],
+                },
+            ];
+            var toExcel = new ExportJsonExcel(option); 
+            toExcel.saveExcel();
         },
-       
+        getdata(limit = 6, page = 1) {
+            ajax(
+                "/contributionSummary/getDhVoybebContributionSummary",
+                {
+                    limit,
+                    page,
+                },
+                "post"
+            ).then((data) => {
+                console.log(data.data.ContributionSummarys);
+                this.data1=data.data.ContributionSummarys
+                this.count=data.voyageSum;
+            });
+        },
+        goye(e){
+           this.page=e;
+        },
+        numb(e){
+           this.limit=e;
+        }
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
-       for(let i=0;i<3;i++){
-           this.data1.push(this.data1[0])
-       }
+        this.getdata();
     },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
-        this.hig=window.innerHeight/2
+        this.hig = window.innerHeight / 2;
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后
@@ -315,7 +367,7 @@ export default {
                         white-space: nowrap;
                     }
                     .kong {
-                        margin:  0.33rem;
+                        margin: 0.33rem;
                     }
                     .ivu-btn {
                         margin-left: 3.21rem;
@@ -352,7 +404,13 @@ export default {
             padding: 0.33rem;
             border: 1px solid #ccc;
             border-radius: 5px;
-            
+            .botm {
+                display: flex;
+                width: 96%;
+                justify-content: flex-end;
+                align-items: center;
+                height: 50px;
+            }
         }
     }
 }

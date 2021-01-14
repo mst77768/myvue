@@ -51,8 +51,11 @@ const routes = [{
     path: "/fankui", //管理员查看附件的反馈页面路由
     component: () => import("../views/oneself-Page/wenjian2")
   },{
-    path:"/readhuiyi/:id",//动态路由的查看会议的页面路由
+    path:"/readhuiyi",//动态路由的查看会议的页面路由
     component:()=>import("../views/oneself-Page/readhuiyi")
+  },{
+    path:"/readyuedu",//查看月度会议的页面路由
+    component:()=>import("../views/oneself-Page/readyuedu.vue")
   }
 
 ];

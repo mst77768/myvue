@@ -405,8 +405,7 @@ export default {
         if (!sessionStorage.getItem("data")) {
             sessionStorage.setItem("data", JSON.stringify(this.data1));
         }
-        
-
+        ajax("http://192.168.0.91:8080/")
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后
@@ -472,7 +471,7 @@ export default {
             border: 1px solid #ccc;
             background-color: white;
             .top1 {
-                height: 45px;
+                height: 1.36rem;
                 width: 100%;
                 border-bottom: 1px solid #ccc;
                 .topxin {
@@ -482,13 +481,13 @@ export default {
                     justify-content: flex-end;
                     align-items: center;
                     .ivu-btn {
-                        margin-right: 20px;
+                        margin-right: 0.6rem;
                     }
                 }
             }
             .tablexin {
                 width: 98%;
-                height: 640px;
+                height: 19.4rem;
                 box-sizing: border-box;
                 margin: 10px auto;
                 position: relative;

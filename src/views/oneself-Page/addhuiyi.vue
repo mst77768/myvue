@@ -9,7 +9,7 @@
                     <Select
                         v-model="form.reportType"
                         clearable
-                        style="width: 150px"
+                        style="width: 4.54rem"
                         @on-change="fn"
                     >
                         <Option
@@ -21,12 +21,13 @@
                     </Select>
                 </div>
                 <div class="itme">
-                    <b>报告日期：</b>
+                    <b>会议日期：</b>
                     <DatePicker
                         type="date"
                         placeholder="年/月/日"
+                        :value="form.meetingDate"
                         @on-change="getdate"
-                        style="width: 150px"
+                        style="width: 4.54rem"
                     ></DatePicker>
                 </div>
                 <div class="itme">
@@ -34,7 +35,7 @@
                     <Input
                         v-model="form.reportName"
                         placeholder="请输入..."
-                        style="width: 150px"
+                        style="width: 4.54rem"
                     />
                 </div>
             </div>
@@ -75,7 +76,7 @@ export default {
             form: {
                 reportType: "周例会",
                 meetingDate: "",
-                reportName: " ",
+                reportName: "",
             },
         };
     },
@@ -109,17 +110,16 @@ export default {
                 reportName:this.form.reportName,
                 meetingDate:this.form.meetingDate
             })
-            console.log(1111111111)
             console.log(newarr)
             let obj = JSON.parse(JSON.stringify(this.form));
            
-            let bak = Object.assign(obj, data);
+            let bak = Object.assign(obj, data);//添加会议报告内容
             console.log(newarr)
             ajax("http://192.168.0.90:8080/dhMettingReport/saveMreport",newarr,"post").then(date=>{
                 console.log(date);
             })
             ajax(
-                "http://192.168.0.90:8080/dhMettingReport/saveMeeting",
+                "http://192.168.0.90:8080/dhMettingReport/saveMeeting",//添加会议表头
                 bak,
                 "post"
             ).then((data) => {
@@ -132,7 +132,11 @@ export default {
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
-    created() {},
+    created() {
+        if(sessionStorage.getItem("perform")){
+            this.form=JSON.parse(sessionStorage.getItem("perform"))
+        }
+    },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {},
@@ -141,6 +145,17 @@ export default {
     beforeDestroy() {}, //生命周期 - 销毁之前
     destroyed() {}, //生命周期 - 销毁完成
     activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
+    beforeRouteLeave(to, from, next) {//组件里面的路由守卫
+       if(to.path=="/person"){
+           sessionStorage.setItem("perform",JSON.stringify(this.form))
+           next()
+       }else{
+           if(sessionStorage.getItem("perform")){
+               sessionStorage.removeItem("perform")
+           }
+           next()
+       }
+    },
 };
 </script>
 <style lang="less" scoped>
@@ -148,7 +163,6 @@ export default {
     width: 100%;
     height: 100%;
     overflow-x: scroll;
-
     // overflow: hidden;
     font-size: 0.42rem;
     background-color: rgba(242, 242, 242, 1);
@@ -160,32 +174,32 @@ export default {
         background-color: white;
         .top {
             width: 92%;
-            height: 60px;
+            height: 1.8rem;
             border-bottom: 1px solid #ccc;
-            line-height: 60px;
+            line-height: 1.8rem;
             margin: 0 auto;
             text-align: center;
             font-size: 18px;
         }
         .inputbox {
             width: 80%;
-            height: 80px;
+            height: 2.4rem;
             display: flex;
-            margin-left: 60px;
+            margin-left: 1.8rem;
 
             justify-content: space-between;
             align-items: center;
             .itme b {
                 font-size: 16px;
                 font-weight: 500;
-                margin-right: 10px;
+                margin-right: 0.33rem;
             }
         }
         .addmain {
             width: 90%;
             margin: 0 auto;
             height: auto;
-            padding-bottom: 30px;
+            padding-bottom: 0.9rem;
         }
     }
 }

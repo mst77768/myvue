@@ -9,7 +9,7 @@
             <div class="topbox">
                 <div class="itme">
                     <b>报告类型: </b>
-                    <Select v-model="model1" style="width: 4.2rem">
+                    <Select v-model="search.reportType" style="width: 4.2rem">
                         <Option
                             v-for="item in cityList"
                             :value="item.value"
@@ -24,17 +24,19 @@
                         type="date"
                         placeholder="年/月/日"
                         style="width: 4.2rem"
+                        @on-change="start"
                     ></DatePicker>
                     &nbsp; --&nbsp;
                     <DatePicker
                         type="date"
                         placeholder="年/月/日"
                         style="width: 4.2rem"
+                        @on-change="end"
                     ></DatePicker>
                 </div>
                 <div class="itme">
                     <b>报告状态: </b>
-                    <Select v-model="model2" style="width: 4.2rem">
+                    <Select v-model="search.reportStatus" style="width: 4.2rem">
                         <Option
                             v-for="item in cityList1"
                             :value="item.value"
@@ -43,7 +45,7 @@
                         >
                     </Select>
                 </div>
-                <Button type="info">查询</Button>
+                <Button type="info" @click="getsearch">查询</Button>
             </div>
             <div class="tablebox">
                 <div class="sumbit">
@@ -56,23 +58,56 @@
                     </div>
                 </div>
                 <div class="table">
-                    <Table  stripe :columns="columns1" :data="data1">
-                        <template slot-scope="{ row }" slot="fujian">
-                             <Tooltip content="点击查看附件！"  placement="top" theme="light">
-                            <a style="font-size:16px;font-weight:800" @click="golook(row)">{{ row.fujian }}</a>
+                    <Table stripe :columns="columns1" :data="data1">
+                        <template slot-scope="{ row }" slot="gmtCreate">
+                            {{ row.gmtCreate.substring(0, 10) }}
+                        </template>
+                        <template slot-scope="{ row }" slot="reportStatus">
+                            {{ cityList1[row.reportStatus-1].label }}
+                        </template>
+                        <template slot-scope="{ row }" slot="attachmentsNumber">
+                            <Tooltip
+                                content="点击查看附件！"
+                                placement="top"
+                                theme="light"
+                            >
+                                <a
+                                    style="font-size: 16px; font-weight: 800"
+                                    @click="golook(row)"
+                                    >{{ row.attachmentsNumber }}</a
+                                >
                             </Tooltip>
                         </template>
-                        <template slot-scope="{ index }" slot="action" >
-                            <Tooltip content="求修改！" placement="top-start" theme="light">
+                        <template slot-scope="{ index }" slot="action">
+                            <Tooltip
+                                content="求修改！"
+                                placement="top-start"
+                                theme="light"
+                            >
                                 <Icon type="ios-create" @click="dyin(index)" />
                             </Tooltip>
 
-                            <Tooltip content="当前状态" placement="top-start" theme="light">
+                            <Tooltip
+                                content="当前状态"
+                                placement="top-start"
+                                theme="light"
+                            >
                                 <Icon type="md-checkmark-circle" />
                             </Tooltip>
-                            
                         </template>
                     </Table>
+                    <div class="botm">
+                        <Page
+                            :total="count"
+                            :page-size-opts="[6, 9, 12]"
+                            :page-size="search.limit"
+                            show-total
+                            show-elevator
+                            show-sizer
+                            @on-change="goye"
+                            @on-page-size-change="numb"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -82,13 +117,23 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import ajax from "@/api/ajax.js";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
     data() {
         //这里存放数据
         return {
+            count: 19,
+           
+            search: {
+                    pageNum: 1,
+                    limit: 12,
+                    begin: "",
+                    end: "",
+                    reportStatus: "",
+                    reportType: "",
+            },
             columns1: [
                 {
                     type: "selection",
@@ -103,38 +148,37 @@ export default {
                 },
                 {
                     title: "报告日期",
-                    key: "age",
+                    slot: "gmtCreate",
                     align: "center",
                     width: "150",
                 },
                 {
                     title: "报告类型",
-                    key: "leixin",
+                    key: "reportType",
                     align: "center",
                     width: "130",
                 },
                 {
                     title: "报告状态",
-                    key: "state",
+                    slot: "reportStatus",
                     align: "center",
                     width: "130",
                 },
                 {
                     title: "报告名称",
-                    key: "reportname",
+                    key: "reportName",
                     align: "center",
                     width: "260",
                 },
-               
+
                 {
                     title: "地点",
-                    key: "address",
+                    key: "meetingPlace",
                     align: "center",
-                    
                 },
                 {
                     title: "附件",
-                    slot: "fujian",
+                    slot: "attachmentsNumber",
                     align: "center",
                     width: "100",
                 },
@@ -145,44 +189,7 @@ export default {
                     align: "center",
                 },
             ],
-            data1: [
-                {
-                    name: 1,
-                    age: "2020-12-18",
-                    leixin: "月度会议",
-                    state: "未提交",
-                    reportname: "2020年12月份月度总结报告",
-                    address: "大会议室",
-                    fujian: "3",
-                },
-                {
-                    name: 2,
-                    age: "2020-11-10",
-                    leixin: "月度会议",
-                    state: "已提交",
-                    reportname: "2020年11月份月度总结报告",
-                    address: "大会议室",
-                    fujian: "3",
-                },
-                {
-                    name: 3,
-                    age: "2020-12-05",
-                    leixin: "周例会",
-                    state: "未审核",
-                    reportname: "安全生产周例会纪要2020W49",
-                    address: "大会议室",
-                    fujian: "0",
-                },
-                {
-                    name: 4,
-                    age: "2020-12-08",
-                    leixin: "周例会",
-                    state: "已审核",
-                    reportname: "安全生产周例会纪要2020W48",
-                    address: "大会议室",
-                    fujian: "0",
-                },
-            ],
+            data1: [],
             cityList: [
                 {
                     value: "月度会议",
@@ -197,27 +204,26 @@ export default {
                     label: "其他会议",
                 },
             ],
-            model1: "",
-            model2: "",
+
             cityList1: [
                 {
-                    value: "未提交",
+                    value: "1",
                     label: "未提交",
                 },
                 {
-                    value: "已提交",
+                    value: "2",
                     label: "已提交",
                 },
                 {
-                    value: "未审核",
+                    value: "3",
                     label: "未审核",
                 },
                 {
-                    value: "已审核",
+                    value: "4",
                     label: "已审核",
                 },
                 {
-                    value: "已确定",
+                    value: "5",
                     label: "已确定",
                 },
             ],
@@ -232,18 +238,56 @@ export default {
         dyin(index) {
             this.$Message.info(`打印第${index + 1}行数据`);
         },
-        
-        golook(row){
-            this.$router.push(`/readhuiyi/${row.name}`);
-        }
 
+        golook(row) {
+            // this.$router.push(`/readhuiyi/${row.name}`);
+            sessionStorage.setItem("look",JSON.stringify(row));
+            this.$router.push("/readhuiyi")
+        },
+        getsearch() {
+            ajax(
+                "http://192.168.0.91:8080/dh-meeting-title/searchConferesnceReport",
+               this.search,
+                "post"
+            ).then((data) => {
+                console.log(data);
+                console.log(data.data.pageInfo.list);
+                let oldarr = data.data.pageInfo.list;
+                this.count=data.data.pageInfo.total
+                console.log(oldarr);
+                oldarr.forEach((item, index) => {
+                    item.name = index + 1;
+                    if (item.gmtModified) {
+                        item.gmtModified = 0;
+                    }
+                });
+                this.data1 = data.data.pageInfo.list;
+            });
+        },
+        start(date) {
+            this.search.begin = date;
+        },
+        end(date) {
+            this.search.end = date;
+        },
+        goye(e) {
+           this.search.pageNum=e;
+           console.log(this.search.pageNum);
+           this.getsearch()
+        },
+        numb(e) {
+           this.search.limit=e;
+           this.getsearch()
+        },
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {},
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
-    mounted() {},
+    mounted() {
+        this.getsearch();
+    },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后
     beforeDestroy() {}, //生命周期 - 销毁之前
@@ -257,7 +301,7 @@ export default {
     height: 99%;
     margin: 4px auto;
     font-size: 0.42rem;
-   
+
     .tabbox {
         width: 100%;
         height: 97%;
@@ -323,6 +367,14 @@ export default {
                 }
                 .ivu-icon-md-print {
                     color: #82c1ff;
+                }
+                .botm {
+                    width: 90%;
+                    display: flex;
+                    margin-top: 0.7rem;
+                    
+                   
+                    justify-content: flex-end;
                 }
             }
         }

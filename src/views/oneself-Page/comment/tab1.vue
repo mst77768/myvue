@@ -7,7 +7,7 @@
                 <Input
                     v-model="form.meetingPlace"
                     placeholder="请输入..."
-                    style="width: 150px"
+                    style="width: 4.5rem"
                 />
             </div>
             <div class="item">
@@ -15,35 +15,44 @@
                 <Button
                     @click="$router.push('/person')"
                     type="primary"
-                    style="margin-bottom: -20px"
+                    style="margin-bottom: -0.6rem"
                     >选择人员</Button
                 >
             </div>
             <div class="item">
                 <b>参会人员：</b>
-                <Input v-model="form.participation" placeholder="" type="textarea" :autosize="{minRows: 2,maxRows: 2}" style="width: 90%" />
+                <Input
+                    v-model="form.participation"
+                    placeholder=""
+                    type="textarea"
+                    :autosize="{ minRows: 2, maxRows: 2 }"
+                    style="width: 90%"
+                />
             </div>
             <div class="item">
                 <b>缺席人员：</b>
-                <Input v-model="form.absent" placeholder="" style="width: 90%" />
+                <Input
+                    v-model="form.absent"
+                    placeholder=""
+                    style="width: 90%"
+                />
             </div>
         </div>
         <div class="tabbox">
             <h3>本周公司及船队各轮需重点关注及解决的事项</h3>
             <Table border :columns="columns1" :data="data1">
-                <template slot-scope="{ row }" slot="name">
+                <template slot-scope="{ row, index }" slot="name">
                     <span v-if="!row.flag">{{ row.name }}</span>
                     <span v-else>
                         <Input
-                            v-model="value12"
+                            v-model="data1[index].name"
                             placeholder="请输入..."
                             clearable
-                            style="width: 120px"
+                            style="width: 3.6rem"
                         />
                     </span>
                 </template>
-                <template slot-scope="{ row,index }" slot="reportContent">
-                  
+                <template slot-scope="{ row, index }" slot="reportContent">
                     <span>
                         <Input
                             v-model="data1[index].reportContent"
@@ -53,14 +62,7 @@
                         />
                     </span>
                 </template>
-                <template slot-scope="{ row }" slot="operation">
-                    <span v-if="!row.flag"> </span>
-                    <span v-else>
-                        <Button type="info" ghost @click="nb(row)"
-                            >确认增加</Button
-                        >
-                    </span>
-                </template>
+                <template slot-scope="{}" slot="operation"> </template>
             </Table>
             <p id="p1" @click="add">+ 新增</p>
             <h3>总裁指示</h3>
@@ -76,9 +78,7 @@
             </div>
         </div>
         <div class="botm">
-            <Button size="large" type="primary" @click="hhh"
-                >提交</Button
-            >
+            <Button size="large" type="primary" @click="hhh">提交</Button>
             <Button size="large" type="success" @click="$router.push('huiyi')"
                 >取消</Button
             >
@@ -89,7 +89,7 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-import ajax from "@/api/ajax.js"
+import ajax from "@/api/ajax.js";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
@@ -97,7 +97,6 @@ export default {
         //这里存放数据
         return {
             flag: true,
-
             columns1: [
                 {
                     title: "部门名称",
@@ -117,13 +116,15 @@ export default {
                     align: "center",
                 },
             ],
-            data1: [],
-            form:{
-                meetingPlace:"",
-                participation:"",
-                absent:"",
-                textarea:"",
+            data1: [], //用于存放后端返回的数据
+            form: {
+                //表单数据
+                meetingPlace: "",
+                participation: "",
+                absent: "",
+                textarea: "",
             },
+            value12: "",
         };
     },
     //监听属性 类似于data概念
@@ -137,7 +138,7 @@ export default {
                 let obj = {
                     flag: true,
                     name: "",
-                    text: "",
+                    reportContent: "",
                     operation: "",
                 };
                 this.data1.push(obj);
@@ -150,61 +151,43 @@ export default {
             }
         },
         nb(obj) {
-            if (this.textarea2 != "" && this.value12 != "") {
-                this.data1[this.data1.length - 1].name = this.value12;
-                this.data1[this.data1.length - 1].text = this.textarea2;
-                this.textarea2 = "";
-                this.value12 = "";
-                this.flag = true;
-                this.data1[this.data1.length - 1].flag = false;
-            } else {
-                this.$Notice.info({
-                    title: "系统提醒！",
-                    desc: "请填写！",
-                });
-            }
+            //确定添加按钮事件
             console.log(obj);
         },
         nb2(index) {
             alert(index);
         },
-        hhh(){
-            let arr=JSON.parse(JSON.stringify(this.data1));
-            // let obj={
-            //     deptName:"总裁",
-            //     reportContent:this.form.textarea
-            // }
-            
-            localStorage.setItem("tab1",JSON.stringify(arr))
-            this.$emit("fn",this.form)//子传父亲
-        }
+        hhh() {
+            let arr = JSON.parse(JSON.stringify(this.data1));
+            localStorage.setItem("tab1", JSON.stringify(arr));
+            this.$emit("fn", this.form); //子传父亲
+        },
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
-        
+        ajax("http://192.168.0.90:8080/sys/SysDept", "get").then((data) => {
+            console.log(data.data.sysDept);
+            this.data1 = data.data.sysDept.slice(0,-1);//把数组截取
+        });
     },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
         var str = sessionStorage.getItem("proson") || "[]";
-        var arr = JSON.parse(str);
-        console.log(arr);
-        if (arr.length) {
-            this.form.participation = arr.toString();
+        // this.form.meetingPlace = sessionStorage.getItem("meetingPlace") || "";
+        console.log(this.form.meetingPlace)
+        var obj = JSON.parse(str);//选择参会人员
+        if (!(obj instanceof Array)) {
+            this.form.participation = obj.a.toString();
+            this.form.absent = obj.b.toString();
         }
-        ajax("http://192.168.0.90:8080/sys/SysDept","get").then(data=>{
-            console.log(data.data.sysDept)
-           
-            this.data1=data.data.sysDept
-        });
-        
-       
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后
     beforeDestroy() {}, //生命周期 - 销毁之前
     destroyed() {
+        sessionStorage.setItem("meetingPlace", JSON.stringify(this.form));
         sessionStorage.removeItem("proson"); //清除本地的
     }, //生命周期 - 销毁完成
     activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
