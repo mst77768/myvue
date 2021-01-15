@@ -87,7 +87,7 @@
                     @on-select="fn"
                     :height="hig"
                 >
-                 <template slot-scope="{ row, index }" slot="voyageEndTime">
+                 <template slot-scope="{row}" slot="voyageEndTime">
                   <span>{{row.voyageEndTime.substring(0,7)}}</span>
         </template>
                 </Table>
@@ -121,7 +121,7 @@ export default {
         return {
             hig: "",
             limit:6,
-            count:40,
+            count:"",
             value14: "",
             cityList: [
                 {
@@ -273,7 +273,7 @@ export default {
                     }
                 }
             }
-            option.fileName = "航次效益分析表";
+            option.fileName = "贡献度分析表";
             option.datas = [
                 {
                     sheetData: dataTable,
@@ -296,14 +296,16 @@ export default {
             ).then((data) => {
                 console.log(data.data.ContributionSummarys);
                 this.data1=data.data.ContributionSummarys
-                this.count=data.voyageSum;
+                this.count=data.data.voyageSum;
             });
         },
         goye(e){
            this.page=e;
+           this.getdata(this.limit,this.page)
         },
         numb(e){
            this.limit=e;
+           this.getdata(this.limit,this.page)
         }
     },
     beforeCreate() {}, //生命周期 - 创建之前

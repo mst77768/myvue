@@ -24,7 +24,7 @@
                     <Button type="warning" @click="updta"> 导出</Button>
                 </div>
             </div>
-            <Seach v-if="!flag" />
+            <Seach v-if="!flag" @seach="seach" />
             <div class="sumbox" v-if="!flag">
                 <span>航次总数: 100</span>
                 <span>货运总量: 100吨</span>
@@ -35,7 +35,6 @@
                     border
                     stripe
                     :loading="loading"
-                    
                     ref="tables"
                     :columns="columns4"
                     :data="data1"
@@ -83,11 +82,11 @@ export default {
         //这里存放数据
         return {
             count: 0,
-            limit:9,
-            week: [],//用于存放周
+            limit: 9,
+            week: [], //用于存放周
             card: 0, //默认第一
-            flag: true,//状态控制
-            weekpage:1,
+            flag: true, //状态控制
+            weekpage: 1,
             columns4: [
                 {
                     type: "selection",
@@ -155,7 +154,7 @@ export default {
                     fixed: "right",
                 },
             ],
-            data1: [],//这里用于存放表格的数据也就是请求回来的数据
+            data1: [], //这里用于存放表格的数据也就是请求回来的数据
             loading: true,
         };
     },
@@ -165,17 +164,23 @@ export default {
     watch: {},
     //方法集合
     methods: {
-       async getweek(i) {//点击周请求每个周的数据请求
+        async getweek(i) {
+            //点击周请求每个周的数据请求
             this.card = i; //点击修改数据
-             this.loading=true;
-            let data=await ajax("/tcSummary/getTCSummary",{
-                limit:this.limit,page:1,week:i
-            },"post");
+            this.loading = true;
+            let data = await ajax(
+                "/tcSummary/getTCSummary",
+                {
+                    limit: this.limit,
+                    page: 1,
+                    week: i,
+                },
+                "post"
+            );
             console.log(data);
-            this.data1=data.data.tcSummarys;
-            this.count=data.data.voyageSum
-            this.loading=false
-
+            this.data1 = data.data.tcSummarys;
+            this.count = data.data.voyageSum;
+            this.loading = false;
         },
         nb() {
             this.flag = false;
@@ -194,20 +199,20 @@ export default {
                 for (let i in data) {
                     if (data) {
                         let obj = {
-                            "月份": data[i].voyageEndTime,
-                            "船名": data[i].vesselNo,
-                            "航次号": data[i].voyageNo,
-                            "币别": data[i].currency,
-                            "船型": data[i].vesselType,
-                            "航线": data[i].route,
-                            "货品": data[i].cargo,
-                            "货量": data[i].volume,
-                            "租家": data[i].charterer,
-                            "运费": data[i].idealFreight,
-                            "预算TC": data[i].budgetTc,
-                            "理想TC": data[i].idealTc,
-                            "实际TC": data[i].actualTc,
-                            "差异": (data[i].actualTc - data[i].idealTc).toFixed(
+                            月份: data[i].voyageEndTime,
+                            船名: data[i].vesselNo,
+                            航次号: data[i].voyageNo,
+                            币别: data[i].currency,
+                            船型: data[i].vesselType,
+                            航线: data[i].route,
+                            货品: data[i].cargo,
+                            货量: data[i].volume,
+                            租家: data[i].charterer,
+                            运费: data[i].idealFreight,
+                            预算TC: data[i].budgetTc,
+                            理想TC: data[i].idealTc,
+                            实际TC: data[i].actualTc,
+                            差异: (data[i].actualTc - data[i].idealTc).toFixed(
                                 2
                             ),
                         };
@@ -220,11 +225,41 @@ export default {
                 {
                     sheetData: dataTable,
                     sheetName: "sheet",
-                    sheetFilter: ["月份", "船名", "航次号","币别","船型","航线","货品","货量","租家","运费","预算TC","理想TC","实际TC","差异"],
-                    sheetHeader: ["月份", "船名", "航次号","币别","船型","航线","货品","货量","租家","运费","预算TC","理想TC","实际TC","差异"],
+                    sheetFilter: [
+                        "月份",
+                        "船名",
+                        "航次号",
+                        "币别",
+                        "船型",
+                        "航线",
+                        "货品",
+                        "货量",
+                        "租家",
+                        "运费",
+                        "预算TC",
+                        "理想TC",
+                        "实际TC",
+                        "差异",
+                    ],
+                    sheetHeader: [
+                        "月份",
+                        "船名",
+                        "航次号",
+                        "币别",
+                        "船型",
+                        "航线",
+                        "货品",
+                        "货量",
+                        "租家",
+                        "运费",
+                        "预算TC",
+                        "理想TC",
+                        "实际TC",
+                        "差异",
+                    ],
                 },
             ];
-            var toExcel = new ExportJsonExcel(option); 
+            var toExcel = new ExportJsonExcel(option);
             toExcel.saveExcel();
         },
         async getdata() {
@@ -234,7 +269,7 @@ export default {
                 { limit: this.limit, page: 1, flag: 1 },
                 "post"
             );
-            
+
             console.log(data);
             let max = data.data.endWeek;
             console.log(max);
@@ -256,25 +291,40 @@ export default {
             console.log(data.data.tcSummarys);
             this.loading = false;
         },
-       async pagedata(limit,page=1,){
-            this.loading=true;
-            let data=await ajax("/tcSummary/getTCSummary",{
-                limit,page
-            },"post");
+        async pagedata(limit, page = 1) {
+            this.loading = true;
+            let data = await ajax(
+                "/tcSummary/getTCSummary",
+                {
+                    limit,
+                    page,
+                },
+                "post"
+            );
             console.log(data);
-            this.data1=data.data.tcSummarys
-            this.loading=false
-
+            this.data1 = data.data.tcSummarys;
+            this.count = data.data.voyageSum;
+            this.loading = false;
         },
         goye(page) {
             //页数切选
-           this.pagedata(this.limit,page)
+            this.pagedata(this.limit, page);
         },
         numb(tlel) {
             //一页几条切换事件
             console.log(tlel);
-            this.limit=tlel;
-            this.pagedata(this.limit,1)
+            this.limit = tlel;
+            this.pagedata(this.limit, 1);
+        },
+        seach(data) {
+            console.log(data);
+            this.loading = true;
+            data["limit"] = this.limit;
+            ajax("/tcSummary/getTCSummary", data, "post").then((data) => {
+                this.data1 = data.data.tcSummarys;
+                this.count = data.data.voyageSum;
+                this.loading = false;
+            });
         },
     },
     beforeCreate() {}, //生命周期 - 创建之前
@@ -282,9 +332,7 @@ export default {
     created() {
         this.getdata();
     },
-    mounted() {
-         
-    },
+    mounted() {},
 };
 </script>
 <style lang="less">

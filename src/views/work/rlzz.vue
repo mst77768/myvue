@@ -11,7 +11,7 @@
                     <div class="item">
                         <b>来源： </b>
                         <Select
-                            v-model="model8"
+                            v-model="form.source"
                             clearable
                             style="width: 4.54rem"
                         >
@@ -25,22 +25,19 @@
                     </div>
                     <div class="item">
                         <b>发布时间：</b>
-                        <TimePicker
-                            format="HH:mm"
-                            placeholder="--:--"
-                            style="width: 4.54rem"
-                            @on-change="fn"
-                        ></TimePicker>
+                        <DatePicker type="date" placeholder="/年/月/日" @on-change="start" style="width: 4.54rem"></DatePicker>
+                      
                     </div>
                     <div class="item">
                         <b>责任部门：</b>
                         <Select
-                            v-model="model8"
+                            v-model="form.executiveDepartment"
                             clearable
+                            @on-change="bumen"
                             style="width: 4.54rem"
                         >
                             <Option
-                                v-for="item in cityList"
+                                v-for="item in zheren"
                                 :value="item.value"
                                 :key="item.value"
                                 >{{ item.label }}</Option
@@ -50,7 +47,7 @@
                     <div class="item">
                         <b>协调部门：</b>
                         <Select
-                            v-model="model8"
+                            v-model="form.coordinationDepartment"
                             clearable
                             style="width: 4.54rem"
                         >
@@ -65,12 +62,12 @@
                     <div class="item">
                         <b>时效类型：</b>
                         <Select
-                            v-model="model8"
+                            v-model="form.prescription_type"
                             clearable
                             style="width: 4.54rem"
                         >
                             <Option
-                                v-for="item in cityList"
+                                v-for="item in type"
                                 :value="item.value"
                                 :key="item.value"
                                 >{{ item.label }}</Option
@@ -80,7 +77,7 @@
                     <div class="item">
                         <b>完成情况：</b>
                         <Select
-                            v-model="model8"
+                            v-model="form.completionStatus"
                             clearable
                             style="width: 4.54rem"
                         >
@@ -94,23 +91,13 @@
                     </div>
                     <div class="item">
                         <b>责任人：</b>
-                        <Select
-                            v-model="model8"
-                            clearable
-                            style="width: 4.54rem"
-                        >
-                            <Option
-                                v-for="item in cityList"
-                                :value="item.value"
-                                :key="item.value"
-                                >{{ item.label }}</Option
-                            >
-                        </Select>
+                        
+                        <Input v-model="form.leadingCadre" placeholder="请输入"  style="width: 4.54rem" />
                     </div>
                     <div class="item">
                         <b>协调人：</b>
                         <Select
-                            v-model="model8"
+                            v-model="form.coordinator"
                             clearable
                             style="width: 4.54rem"
                         >
@@ -142,17 +129,17 @@
                         border
                         :columns="columns1"
                         :data="data1"
-                        highlight-row="true"
+                        highlight-row
                         disabled-hover
                         @on-row-click="fn2"
                         :height="hig"
                     >
-                        <template slot-scope="{ row }" slot="text">
+                        <template slot-scope="{ row }" slot="executionContent">
                             <Poptip
                                 trigger="hover"
                                 word-wrap
                                 width="450"
-                                :content="row.text"
+                                :content="row.executionContent"
                             >
                                 <div
                                     style="
@@ -163,11 +150,14 @@
                                         text-overflow: ellipsis;
                                     "
                                 >
-                                    {{ row.text }}
+                                    {{ row.executionContent }}
                                 </div>
                             </Poptip>
                         </template>
-                        <template slot-scope="{ row, index }" slot="number">
+                        <template
+                            slot-scope="{ row, index }"
+                            slot="attachmentsNumber"
+                        >
                             <Poptip
                                 trigger="hover"
                                 width="200"
@@ -181,12 +171,26 @@
                                         font-size: 16px;
                                     "
                                     @click="goupdata(index)"
-                                    >{{ row.number }}</span
+                                    >{{ row.attachmentsNumber }}</span
                                 >
                             </Poptip>
                         </template>
                     </Table>
+                    <div class="botm">
+                    <Page
+                        :total="count"
+                        :page-size-opts="[6, 9, 12]"
+                        :page-size="size"
+                        show-total
+                        show-elevator
+                        show-sizer
+                        placement="top"
+                        @on-change="goye"
+                        @on-page-size-change="numb"
+                    />
                 </div>
+                </div>
+                
             </div>
         </div>
     </div>
@@ -195,16 +199,39 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-import ajax from "@/api/ajax"
+
+import ajax from "@/api/ajax";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
     data() {
         //这里存放数据
         return {
-            hig: "",
+            hig: 0,
+            count: 0,
+            size:6,
+            page:1,
             index: 0,
-            abb: "马帅要",
+            zheren:[],
+            form:{
+                source:"",//来源
+                release_time:"",
+                prescription_type:"",
+                completion_status:"",
+                executive_department:"",
+                leading_cadre:"",
+                coordination_department:"",
+                coordinator:""
+            },
+            type:[
+                {
+                    value:"非时效",
+                    label:"非时效"
+                },{
+                    value:"时效",
+                    label:"时效"
+                }
+            ],
             cityList: [
                 {
                     value: "月度会议",
@@ -227,7 +254,7 @@ export default {
                     label: "不符合",
                 },
             ],
-            model8: "",
+            
             columns1: [
                 {
                     title: "序号",
@@ -243,132 +270,78 @@ export default {
                 },
                 {
                     title: "发布日期",
-                    key: "date",
+                    key: "meetingDate",
                     align: "center",
                     width: "120",
                 },
                 {
                     title: "时效类型",
-                    key: "aging",
+                    key: "prescriptionType",
                     align: "center",
                     width: "120",
                 },
                 {
                     title: "要求完成时间",
-                    key: "overtime",
+                    key: "releaseTime",
                     align: "center",
                     width: "140",
                 },
                 {
                     title: "汇报频率",
-                    key: "frequency",
+                    key: "reportingFrequency",
                     align: "center",
                     width: "120",
                 },
                 {
                     title: "执行内容",
-                    slot: "text",
+                    slot: "executionContent",
                     align: "center",
                     width: "550",
                 },
                 {
                     title: "责任部门",
-                    key: "execute",
+                    key: "executiveDepartment",
                     align: "center",
                     width: "120",
                 },
                 {
                     title: "负责人",
-                    key: "person",
+                    key: "leadingCadre",
                     align: "center",
                     width: "120",
                 },
                 {
                     title: "协调部门",
-                    key: "xietiao",
+                    key: "coordinationDepartment",
                     align: "center",
                     width: "120",
                 },
                 {
                     title: "协调人",
-                    key: "xietiao",
+                    key: "coordinator",
                     align: "center",
                     width: "120",
                 },
                 {
                     title: "完成状态",
-                    key: "wczt",
+                    key: "completionStatus",
                     align: "center",
                     width: "120",
                 },
                 {
                     title: "情况说明",
-                    key: "qksm",
+                    key: "informationNote",
                     align: "center",
                     width: "180",
                 },
                 {
                     title: "附件总数",
-                    slot: "number",
+                    slot: "attachmentsNumber",
                     align: "center",
                     width: "140",
                 },
             ],
-            data1: [
-                {
-                    id: 1,
-                    source: "周例会",
-                    date: "2020-02-11",
-                    aging: "时效",
-                    overtime: "2020-05-20",
-                    frequency: "月末",
-                    text:
-                        "当前公司首要任务是确保公司员工特别是船员避免受到新冠疫情侵害。要求船员部高度重视，建立健全相关制度，采取一切可行措施保证船员尽量避免与外界接触，适时监控船舶执行情况，每日在公司微信群发布“船员防疫监控日报”。",
-                    execute: "信息化中心",
-                    person: "李兴波",
-                    wczt: "完成",
-                    number: 3,
-                },
-                {
-                    id: 2,
-                    source: "月度例会",
-                    date: "2016-10-01",
-                    aging: "时效",
-                    overtime: "2020-05-20",
-                    frequency: "月末",
-                    text:
-                        "目前，整个国家正在处在危机中。如果疫情短时间不能好转，将会有大量民营企业企业破产，鼎衡也会面临重大困难。我们必须做好三个月（即直到5月底）才能恢复正常的准备。",
-                    execute: "信息化中心",
-                    person: "李兴波",
-                    wczt: "进行中",
-                },
-                {
-                    id: 3,
-                    source: "邮件",
-                    date: "2016-10-02",
-                    aging: "时效",
-                    overtime: "2020-05-20",
-                    frequency: "月末",
-                    text:
-                        "装载易凝固货物船舶加装伴温管解决防冻问题，10月份之前全部完成",
-                    execute: "信息化中心",
-                    person: "李兴波",
-                    wczt: "进行中",
-                },
-                {
-                    id: 4,
-                    source: "微信",
-                    date: "2016-10-04",
-                    aging: "非时效",
-                    overtime: "2020-05-20",
-                    frequency: "月末",
-                    text:
-                        "最近这几艘船舶报表主机平均转速均达不到115转左右，远低于设计转速。要弄明白为什么？用主机健康管理程序中的表格进行分析，判断是主机是否处于健康状态，或污底或螺旋桨问题。脱开轴发只是权宜之计，根本解决办法还是要让船舶恢复到试航状态。目前油价很低，船舶能够开快一点对效益提升立竿见影。要想方设法发掘主机潜力，合理配载，增加航速。",
-                    execute: "信息化中心",
-                    person: "李兴波",
-                    wczt: "进行中",
-                },
-            ],
+            data1: [],
         };
     },
     //监听属性 类似于data概念
@@ -377,6 +350,12 @@ export default {
     watch: {},
     //方法集合
     methods: {
+        async bumen(){//
+           let data=await ajax("http://192.168.0.90:8011/sys-dept/findDepartmentHead",{
+               name:this.form.executiveDepartment
+           },"get");
+           console.log(data)
+        },
         fn(data) {
             //获取时间的方法
             console.log(data);
@@ -394,6 +373,37 @@ export default {
             this.index = b;
             console.log(a);
         },
+        async getdata(pageNum=1,pageSize=6) {
+            let res=await ajax(
+                "http://192.168.0.90:8011/dh-executive-tracking/searchExecutiveTracking",
+                {
+                    pageNum,
+                    pageSize,
+                },
+                "post"
+            )
+                this.count= parseInt(res.data.pageInfo.total)
+                let arr = res.data.pageInfo.list;
+                arr.forEach((item, index) => {
+                    item["id"] = index + 1;
+                });
+                this.data1 = arr;//获取数据
+            let bumen=await ajax("http://192.168.0.91:8080/sys-dept/searchDepartmentName",{},"post")
+            // console.log(bumen.data.names)
+            this.zheren=bumen.data.names
+        },
+        goye(e) {
+            this.page=e;
+            this.getdata(this.page,this.size)
+        },
+        numb(e) {
+            this.size=e;
+            this.getdata(this.page,this.size)
+        },
+        start(date){//获取日期的方法
+            console.log(date)
+            this.form.release_time=date;
+        }
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
@@ -405,7 +415,7 @@ export default {
         if (!sessionStorage.getItem("data")) {
             sessionStorage.setItem("data", JSON.stringify(this.data1));
         }
-        ajax("http://192.168.0.91:8080/")
+        this.getdata();
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后
@@ -494,8 +504,16 @@ export default {
                 .ivu-table-wrapper {
                     overflow: visible;
                 }
+                .botm{
+                    display: flex;
+                    justify-content: flex-end;
+                    width: 97%;
+                    margin-top: 0.5rem;
+                }
+                
             }
         }
     }
 }
+
 </style>

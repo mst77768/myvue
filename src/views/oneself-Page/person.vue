@@ -121,7 +121,7 @@ export default {
             } else {
                 this.id = id;
                 ajax(
-                    `http://192.168.0.90:8080/sys/SysPost`,
+                    `http://192.168.0.90:8011/sys-dept/SysPost`,
                     {
                         id,
                     },
@@ -134,7 +134,7 @@ export default {
                         this.model2 = "";
                     }
                     ajax(
-                        "http://192.168.0.90:8080/sys/SysUser",
+                        "http://192.168.0.90:8011/sys-dept/SysUser",
                         {
                             id: this.id,
                             sysPostId: this.model2,
@@ -151,7 +151,7 @@ export default {
             //赛选
             if (sysPostId > 0) {
                 ajax(
-                    "http://192.168.0.90:8080/sys/SysUser",
+                    "http://192.168.0.90:8011/sys-dept/SysUser",
                     {
                         id: this.id,
                         sysPostId,
@@ -167,12 +167,12 @@ export default {
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
-        ajax("http://192.168.0.90:8080/sys/SysUser", "get").then((data) => {
+        ajax("http://192.168.0.90:8011/sys-dept/SysUser", "get").then((data) => {
             console.log(data.data.list);
             this.data2 = data.data.list;
             this.newdata=JSON.parse(JSON.stringify(this.data2))
         });
-        ajax("http://192.168.0.90:8080//sys/SysInputDept", "get").then(
+        ajax("http://192.168.0.90:8011/sys-dept/SysInputDept", "get").then(
             (data) => {
                 console.log(data.data.list);
                 this.cityList = data.data.arr;

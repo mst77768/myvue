@@ -170,7 +170,7 @@ export default {
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
-        ajax("http://192.168.0.90:8080/sys/SysDept", "get").then((data) => {
+        ajax("http://192.168.0.90:8011/sys-dept/SysDept", "get").then((data) => {
             console.log(data.data.sysDept);
             this.data1 = data.data.sysDept.slice(0,-1);//把数组截取
         });

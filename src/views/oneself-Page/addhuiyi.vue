@@ -115,11 +115,11 @@ export default {
            
             let bak = Object.assign(obj, data);//添加会议报告内容
             console.log(newarr)
-            ajax("http://192.168.0.90:8080/dhMettingReport/saveMreport",newarr,"post").then(date=>{
+            ajax("http://192.168.0.90:8011/dh-meeting-title/saveMreport",newarr,"post").then(date=>{
                 console.log(date);
             })
             ajax(
-                "http://192.168.0.90:8080/dhMettingReport/saveMeeting",//添加会议表头
+                "http://192.168.0.90:8011/dh-meeting-title/saveMeeting",//添加会议表头
                 bak,
                 "post"
             ).then((data) => {

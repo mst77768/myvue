@@ -67,7 +67,7 @@ export default {
         console.log(JSON.parse(sessionStorage.getItem("look")))
         let obj=JSON.parse(sessionStorage.getItem("look"))
         ajax(
-            "http://192.168.0.90:8080/dh-mreport/SelReport",
+            "http://192.168.0.90:8011/dh-mreport/SelReport",
             {
                 reportType: obj.reportType,
                 reportName: obj.reportName,

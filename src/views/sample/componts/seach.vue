@@ -4,9 +4,9 @@
         <div class="seachbox" >
             <div>
                 <span>船名: </span>
-                <Select v-model="form.vesselNo" style="width: 3.8rem">
+                <Select v-model="form.vesselNo" clearable style="width: 3.8rem">
                     <Option
-                        v-for="item in cityList"
+                        v-for="item in vonlist"
                         :value="item.value"
                         :key="item.value"
                         >{{ item.label }}</Option
@@ -15,9 +15,9 @@
             </div>
             <div>
                 <span>航次号:</span>
-                <Select v-model="form.voyageNo" style="width: 3.8rem">
+                <Select v-model="form.voyageNo" clearable style="width: 3.8rem">
                     <Option
-                        v-for="item in cityList"
+                        v-for="item in yonlist"
                         :value="item.value"
                         :key="item.value"
                         >{{ item.label }}</Option
@@ -26,9 +26,9 @@
             </div>
             <div>
                 <span>租家:</span>
-                <Select v-model="model1" style="width: 3.8rem">
+                <Select v-model="form.charterer" clearable style="width: 3.8rem">
                     <Option
-                        v-for="item in cityList"
+                        v-for="item in Zlist"
                         :value="item.value"
                         :key="item.value"
                         >{{ item.label }}</Option
@@ -37,29 +37,33 @@
             </div>
             <div>
                 <span>航线:</span>
-                <Input
-                    v-model="value14"
-                    placeholder="请输入"
-                    clearable
-                    style="width: 4.54rem"
-                />
+                <Select
+                v-model="form.route"
+                filterable
+                clearable
+                :remote-method="remoteMethod1"
+                :loading="loading1"
+                style="width: 4.7rem">
+                <Option v-for="(option, index) in options1" :value="option.value" :key="index">{{option.label}}</Option>
+            </Select>
             </div>
             <div class="yue">
                 <span>月份范围:</span>
                 <DatePicker
-                    type="month"
+                    type="datetime"
                     placeholder="__年__月__日"
                     style="width: 3.6rem"
                     @on-change="fn"
                 ></DatePicker>
                 <div class="kong"></div>
                 <DatePicker
-                    type="month"
+                    type="datetime"
                     placeholder="__年__月__日"
                     style="width: 3.6rem"
+                    @on-change="fn2"
                 ></DatePicker>
             </div>
-            <div><Button type="primary" style="width: 2.42rem">查询</Button></div>
+            <div><Button type="primary" style="width: 2.42rem" @click="seach">查询</Button></div>
         </div>
     </div>
 </template>
@@ -74,14 +78,22 @@ export default {
     data() {
         //这里存放数据
         return {
+            loading1: false,
+            vonlist:[],//船名的数据
+            yonlist:[],//航次号的数据
+            Zlist:[],//租家的数据
+            list:[],//航线的数据
             value14: "123",
             cityList: [],
+            options1:[],
             form:{
                 charterer:"",
                 voyageNo:"",
                 route:"",
                 vesselNo:""
-           }
+           },
+           endTime:"",
+           startTime:"",
         };
     },
     //监听属性 类似于data概念
@@ -90,13 +102,15 @@ export default {
     watch: {},
     //方法集合
     methods: {
-        fn(a, b) {
+        fn(data) {//获取开始的时间
             //监听日期的改变
-            console.log(a); //拿到了修改后的日期
-            console.log(b); //这是日期的类型
+             this.startTime=data
+            console.log(data)
         },
-        cat(arr,oldarr){
-          arr=[];
+        fn2(data){//获取结束的时间
+          this.endTime=data;
+        },
+        cat(arr,oldarr){//这是封装的一个转换数据格式法法
           oldarr.forEach(item => {
               let obj={
                   value:item,
@@ -104,7 +118,34 @@ export default {
               }
               arr.push(obj)
           });          
-        }
+        },
+         remoteMethod1 (query) {
+                if (query !== '') {
+                    this.loading1 = true;
+                    setTimeout(() => {
+                        this.loading1 = false;
+                        const list = this.list.map(item => {
+                            return {
+                                value: item,
+                                label: item
+                            };
+                        });
+                        this.options1 = list.filter(item => item.label.toLowerCase().indexOf(query.toLowerCase()) > -1);
+                    }, 200);
+                } else {
+                    this.options1 = [];
+                }
+            },
+            seach(){
+                let obj={
+                    dhVoybebVoyage:this.form,
+                    endTime:this.endTime,
+                    startTime:this.startTime,
+                    page:1
+                }
+                this.$emit("seach",obj)
+            }
+           
       
        
     },
@@ -117,7 +158,11 @@ export default {
              let arr2=data.data.routeList//航线的数据
              let arr3=data.data.vesselNoList//船名的数据
              let arr4=data.data.voyageNoList//航次号的数据
-             
+             this.cat(this.Zlist,arr1)
+            //  this.cat(this.Hlist,arr2)
+             this.list=arr2
+             this.cat(this.vonlist,arr3)
+             this.cat(this.yonlist,arr4)
          })
     },
     beforeMount() {}, //生命周期 - 挂载之前

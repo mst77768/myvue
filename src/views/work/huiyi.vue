@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 <div class="table">
-                    <Table stripe :columns="columns1" :data="data1">
+                    <Table stripe :columns="columns1" :data="data1" max-height="500">
                         <template slot-scope="{ row }" slot="gmtCreate">
                             {{ row.gmtCreate.substring(0, 10) }}
                         </template>
