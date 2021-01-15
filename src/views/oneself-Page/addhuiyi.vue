@@ -125,6 +125,7 @@ export default {
             ).then((data) => {
                 console.log(data);
             });
+            sessionStorage.removeItem("meet");//用完把他删除
         },
         getdate(date) {
             this.form.meetingDate = date;

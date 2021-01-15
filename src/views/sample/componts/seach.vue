@@ -4,7 +4,7 @@
         <div class="seachbox" >
             <div>
                 <span>船名: </span>
-                <Select v-model="model1" style="width: 3.8rem">
+                <Select v-model="form.vesselNo" style="width: 3.8rem">
                     <Option
                         v-for="item in cityList"
                         :value="item.value"
@@ -15,7 +15,7 @@
             </div>
             <div>
                 <span>航次号:</span>
-                <Select v-model="model1" style="width: 3.8rem">
+                <Select v-model="form.voyageNo" style="width: 3.8rem">
                     <Option
                         v-for="item in cityList"
                         :value="item.value"
@@ -67,7 +67,7 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import ajax from "@/api/ajax.js"
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
@@ -75,34 +75,13 @@ export default {
         //这里存放数据
         return {
             value14: "123",
-            cityList: [
-                {
-                    value: "New York",
-                    label: "dh2",
-                },
-                {
-                    value: "London",
-                    label: "dh3",
-                },
-                {
-                    value: "Sydney",
-                    label: "dh4",
-                },
-                {
-                    value: "Ottawa",
-                    label: "dh5",
-                },
-                {
-                    value: "Paris",
-                    label: "dh6",
-                },
-                {
-                    value: "Canberra",
-                    label: "dh10",
-                },
-            ],
-            model8: "",
-            model1: "",
+            cityList: [],
+            form:{
+                charterer:"",
+                voyageNo:"",
+                route:"",
+                vesselNo:""
+           }
         };
     },
     //监听属性 类似于data概念
@@ -116,14 +95,36 @@ export default {
             console.log(a); //拿到了修改后的日期
             console.log(b); //这是日期的类型
         },
+        cat(arr,oldarr){
+          arr=[];
+          oldarr.forEach(item => {
+              let obj={
+                  value:item,
+                  label:item
+              }
+              arr.push(obj)
+          });          
+        }
+      
+       
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
-    created() {},
+    created() {
+        ajax("/common/getSelectTCSummary",{},"get").then(data=>{
+             console.log(data)
+             let arr1=data.data.chartererList;//租家的数据】
+             let arr2=data.data.routeList//航线的数据
+             let arr3=data.data.vesselNoList//船名的数据
+             let arr4=data.data.voyageNoList//航次号的数据
+             
+         })
+    },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
         
+             
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后

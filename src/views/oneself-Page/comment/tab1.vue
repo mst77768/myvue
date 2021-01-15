@@ -13,7 +13,7 @@
             <div class="item">
                 <b></b>
                 <Button
-                    @click="$router.push('/person')"
+                    @click="goperon"
                     type="primary"
                     style="margin-bottom: -0.6rem"
                     >选择人员</Button
@@ -162,6 +162,10 @@ export default {
             localStorage.setItem("tab1", JSON.stringify(arr));
             this.$emit("fn", this.form); //子传父亲
         },
+        goperon(){
+          sessionStorage.setItem("meet",JSON.stringify(this.form.meetingPlace))
+          this.$router.push('/person');
+        }
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
@@ -181,6 +185,9 @@ export default {
         if (!(obj instanceof Array)) {
             this.form.participation = obj.a.toString();
             this.form.absent = obj.b.toString();
+        }
+        if(sessionStorage.getItem("meet")){
+            this.form.meetingPlace=JSON.parse(sessionStorage.getItem("meet"))
         }
     },
     beforeUpdate() {}, //生命周期 - 更新之前

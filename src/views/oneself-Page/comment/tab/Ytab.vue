@@ -5,7 +5,7 @@
             <div class="itme" v-for="(item, index) in arr" :key="index">
                 <div class="mtop">
                     <Input
-                        v-model="item.value16"
+                        v-model="item.reportTitle"
                         size="large"
                         show-word-limit
                         placeholder="编辑标题（例：一、本月重要工作和成绩）"
@@ -16,7 +16,7 @@
                 </div>
                 <div class="bb">
                     <Input
-                        v-model="item.value6"
+                        v-model="item.reportContent"
                         type="textarea"
                         :rows="9"
                         placeholder="请输入正文
@@ -24,7 +24,7 @@
                     />
                 </div>
             </div>
-            <p class="ip" @click="add">+新增</p>
+            
         </div>
     </div>
 </template>
@@ -39,14 +39,10 @@ export default {
     data() {
         //这里存放数据
         return {
-            arr: [
-                {
-                    value16: "",
-                    value6: "",
-                },
-            ],
+            
         };
     },
+    props:["arr"],
     //监听属性 类似于data概念
     computed: {},
     //监控data中的数据变化

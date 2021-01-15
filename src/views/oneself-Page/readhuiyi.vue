@@ -2,9 +2,7 @@
 <template>
     <div class="readhuiyi" id="printMe">
         <div class="xinbox"  ref="bin" >
-            
                 <Icon type="md-print" class="bbbq" @click="gof"  v-print="'#printMe'"/>
-            
             <div class="top">会议报告</div>
             <div class="inputbox">
                 <div class="itme">

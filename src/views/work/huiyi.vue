@@ -9,7 +9,7 @@
             <div class="topbox">
                 <div class="itme">
                     <b>报告类型: </b>
-                    <Select v-model="search.reportType" style="width: 4.2rem">
+                    <Select v-model="search.reportType" clearable style="width: 4.2rem">
                         <Option
                             v-for="item in cityList"
                             :value="item.value"
@@ -36,7 +36,7 @@
                 </div>
                 <div class="itme">
                     <b>报告状态: </b>
-                    <Select v-model="search.reportStatus" style="width: 4.2rem">
+                    <Select v-model="search.reportStatus" clearable style="width: 4.2rem">
                         <Option
                             v-for="item in cityList1"
                             :value="item.value"
@@ -240,9 +240,15 @@ export default {
         },
 
         golook(row) {
-            // this.$router.push(`/readhuiyi/${row.name}`);
             sessionStorage.setItem("look",JSON.stringify(row));
-            this.$router.push("/readhuiyi")
+            if(row.reportType==="周例会"){
+this.$router.push("/readhuiyi")
+            }else if(row.reportType==="月度会议"){
+                this.$router.push("/readyuedu");
+            }
+            // this.$router.push(`/readhuiyi/${row.name}`);
+            
+            
         },
         getsearch() {
             ajax(

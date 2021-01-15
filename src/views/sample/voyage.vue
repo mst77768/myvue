@@ -35,6 +35,7 @@
                     border
                     stripe
                     :loading="loading"
+                    
                     ref="tables"
                     :columns="columns4"
                     :data="data1"
@@ -86,6 +87,7 @@ export default {
             week: [],//用于存放周
             card: 0, //默认第一
             flag: true,//状态控制
+            weekpage:1,
             columns4: [
                 {
                     type: "selection",
@@ -163,8 +165,17 @@ export default {
     watch: {},
     //方法集合
     methods: {
-        getweek(i) {
+       async getweek(i) {//点击周请求每个周的数据请求
             this.card = i; //点击修改数据
+             this.loading=true;
+            let data=await ajax("/tcSummary/getTCSummary",{
+                limit:this.limit,page:1,week:i
+            },"post");
+            console.log(data);
+            this.data1=data.data.tcSummarys;
+            this.count=data.data.voyageSum
+            this.loading=false
+
         },
         nb() {
             this.flag = false;
@@ -223,6 +234,7 @@ export default {
                 { limit: this.limit, page: 1, flag: 1 },
                 "post"
             );
+            
             console.log(data);
             let max = data.data.endWeek;
             console.log(max);
@@ -249,7 +261,6 @@ export default {
             let data=await ajax("/tcSummary/getTCSummary",{
                 limit,page
             },"post");
-
             console.log(data);
             this.data1=data.data.tcSummarys
             this.loading=false
@@ -272,9 +283,7 @@ export default {
         this.getdata();
     },
     mounted() {
-        ajax("/common/getSelect",{},"get").then(data=>{
-            console.log(data)
-        })
+         
     },
 };
 </script>
