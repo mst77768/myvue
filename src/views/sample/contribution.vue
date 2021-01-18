@@ -10,9 +10,9 @@
                 <div class="top">
                     <div class="npm nb">
                         <span>船名: </span>
-                        <Select v-model="model1" style="width: 3.9rem">
+                        <Select v-model="form.dhVoybebVoyage.vesselNo" style="width: 4.5rem">
                             <Option
-                                v-for="item in cityList"
+                                v-for="item in cm"
                                 :value="item.value"
                                 :key="item.value"
                                 >{{ item.label }}</Option
@@ -21,9 +21,9 @@
                     </div>
                     <div class="nb">
                         <span>航线: </span>
-                        <Select v-model="model1" style="width: 3.9rem">
+                        <Select v-model="form.dhVoybebVoyage.route" style="width: 4.5rem">
                             <Option
-                                v-for="item in cityList"
+                                v-for="item in hx"
                                 :value="item.value"
                                 :key="item.value"
                                 >{{ item.label }}</Option
@@ -33,7 +33,7 @@
                     <div class="nb">
                         <span>船队总管: </span>
                         <Input
-                            v-model="value14"
+                            v-model="form.dhVoybebVoyage.fleetManager"
                             placeholder="请输入..."
                             clearable
                         />
@@ -41,30 +41,23 @@
                     <div class="nb">
                         <span> 海务主管: </span>
                         <Input
-                            v-model="value14"
+                            v-model="form.dhVoybebVoyage.maritimeOfficer"
                             placeholder="请输入..."
                             clearable
                         />
                     </div>
                     <div class="nb">
-                        <span>油料部: </span>
-                        <Input
-                            v-model="value14"
-                            placeholder="请输入..."
-                            clearable
-                            style="width: 4.2rem"
-                        />
-                    </div>
-                    <div class="nb">
-                        <span> 月份范围: </span>
+                        <span>时间范围: </span>
                         <DatePicker
-                            type="month"
-                            placeholder="__年__月"
+                            type="datetime"
+                            placeholder="__年__月_日"
+                            @on-change="start"
                         ></DatePicker>
                         <span class="kong">~</span>
                         <DatePicker
-                            type="month"
-                            placeholder="__年__月"
+                            type="datetime"
+                            placeholder="__年__月_日"
+                            @on-change="end"
                         ></DatePicker>
                         <Button type="primary">查询</Button>
                     </div>
@@ -73,8 +66,8 @@
 
             <div class="sumbox">
                 <div class="contrleft">
-                    <div class="hsum">航次总数: 100</div>
-                    <div class="Tc">TC损失:5000美金</div>
+                    <div class="hsum">航次总数: {{voyageSum}}</div>
+                    <div class="Tc">TC损失:{{tcSum}}美金</div>
                 </div>
                 <div><Button type="warning" @click="updta">导出</Button></div>
             </div>
@@ -119,36 +112,28 @@ export default {
     data() {
         //这里存放数据
         return {
+            form:{
+               endTime:"",
+               startTime:"",
+               limit:"",
+               page:"",
+               dhVoybebVoyage:{
+                   vesselNo:"",
+                   route:"",
+                   fleetManager:"",
+                   maritimeOfficer:"",
+               }
+            },
             hig: "",
             limit:6,
-            count:"",
-            value14: "",
-            cityList: [
-                {
-                    value: "New York",
-                    label: "New York",
-                },
-                {
-                    value: "London",
-                    label: "London",
-                },
-                {
-                    value: "Sydney",
-                    label: "Sydney",
-                },
-                {
-                    value: "Ottawa",
-                    label: "Ottawa",
-                },
-                {
-                    value: "Paris",
-                    label: "Paris",
-                },
-                {
-                    value: "Canberra",
-                    label: "Canberra",
-                },
-            ],
+            count:0,
+            tcSum:"",
+            value14:"",
+            voyageSum:"",
+            cm:[],
+            cd:[],
+            hw:[],
+            hx:[],
             model1: "",
             columns4: [
                 {
@@ -181,6 +166,7 @@ export default {
                 {
                     title: "理想TC",
                     key: "idealTc",
+                    tooltip: true,
                 },
                 {
                     title: "实际TC",
@@ -242,7 +228,23 @@ export default {
         fn(a) {
             console.log(a);
         },
-        updta() {
+        math(arr,newarr){
+            arr.forEach(item => {
+                let obj={
+                    label:item,
+                    value:item,
+                }
+                newarr.push(obj)
+            });
+        },
+       async getda(){
+           let res=await ajax("/common/getSelectContributionSummary",{},"get");
+           this.math(res.data.fleetManagerList,this.cd)
+           this.math(res.data.maritimeOfficerList,this.hw);
+           this.math(res.data.routeList,this.hx);
+           this.math(res.data.vesselNoList,this.cm)  
+        },
+        updta() {//此功能用于导出表格功能
             const data = this.data1 ? this.data1 : ""; //表格数据
             var option = {};
             let dataTable = [];
@@ -294,7 +296,10 @@ export default {
                 },
                 "post"
             ).then((data) => {
-                console.log(data.data.ContributionSummarys);
+               
+                this.voyageSum=data.data.voyageSum;
+                this.tcSum=data.data.tcSum
+               
                 this.data1=data.data.ContributionSummarys
                 this.count=data.data.voyageSum;
             });
@@ -306,6 +311,12 @@ export default {
         numb(e){
            this.limit=e;
            this.getdata(this.limit,this.page)
+        },
+        start(data){
+          this.form.startTime=data;
+        },
+        end(data){
+          this.form.endTime=data;
         }
     },
     beforeCreate() {}, //生命周期 - 创建之前
@@ -316,6 +327,7 @@ export default {
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
+        this.getda()
         this.hig = window.innerHeight / 2;
     },
     beforeUpdate() {}, //生命周期 - 更新之前

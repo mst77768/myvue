@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 <div class="table">
-                    <Table stripe :columns="columns1" :data="data1" max-height="500">
+                    <Table stripe :columns="columns1" :data="data1" max-height="hig">
                         <template slot-scope="{ row }" slot="gmtCreate">
                             {{ row.gmtCreate.substring(0, 10) }}
                         </template>
@@ -124,8 +124,8 @@ export default {
     data() {
         //这里存放数据
         return {
-            count: 19,
-           
+            hig:500,
+            count: 19,//总数
             search: {
                     pageNum: 1,
                     limit: 12,
@@ -150,25 +150,25 @@ export default {
                     title: "报告日期",
                     slot: "gmtCreate",
                     align: "center",
-                    width: "150",
+                    width: 150,
                 },
                 {
                     title: "报告类型",
                     key: "reportType",
                     align: "center",
-                    width: "130",
+                    width: 130,
                 },
                 {
                     title: "报告状态",
                     slot: "reportStatus",
                     align: "center",
-                    width: "130",
+                    width: 130,
                 },
                 {
                     title: "报告名称",
                     key: "reportName",
                     align: "center",
-                    width: "260",
+                    width: 260,
                 },
 
                 {
@@ -180,7 +180,7 @@ export default {
                     title: "附件",
                     slot: "attachmentsNumber",
                     align: "center",
-                    width: "100",
+                    width:  100,
                 },
                 {
                     title: "操作",
@@ -189,7 +189,7 @@ export default {
                     align: "center",
                 },
             ],
-            data1: [],
+            data1: [],//用于存储请求回来的数据
             cityList: [
                 {
                     value: "月度会议",
@@ -246,9 +246,7 @@ this.$router.push("/readhuiyi")
             }else if(row.reportType==="月度会议"){
                 this.$router.push("/readyuedu");
             }
-            // this.$router.push(`/readhuiyi/${row.name}`);
-            
-            
+            // this.$router.push(`/readhuiyi/${row.name}`);   
         },
         getsearch() {
             ajax(
@@ -259,7 +257,7 @@ this.$router.push("/readhuiyi")
                 console.log(data);
                 console.log(data.data.pageInfo.list);
                 let oldarr = data.data.pageInfo.list;
-                this.count=data.data.pageInfo.total
+                this.count=Number(data.data.pageInfo.total)
                 console.log(oldarr);
                 oldarr.forEach((item, index) => {
                     item.name = index + 1;
@@ -293,6 +291,7 @@ this.$router.push("/readhuiyi")
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
         this.getsearch();
+        this.hig=window.innerHeight / 2;
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后

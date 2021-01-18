@@ -25,8 +25,12 @@
                     </div>
                     <div class="item">
                         <b>发布时间：</b>
-                        <DatePicker type="date" placeholder="/年/月/日" @on-change="start" style="width: 4.54rem"></DatePicker>
-                      
+                        <DatePicker
+                            type="date"
+                            placeholder="/年/月/日"
+                            @on-change="start"
+                            style="width: 4.54rem"
+                        ></DatePicker>
                     </div>
                     <div class="item">
                         <b>责任部门：</b>
@@ -50,9 +54,9 @@
                             v-model="form.coordinationDepartment"
                             clearable
                             style="width: 4.54rem"
-                        >
+                            @on-change="xietiaofn">
                             <Option
-                                v-for="item in cityList"
+                                v-for="item in xietiao"
                                 :value="item.value"
                                 :key="item.value"
                                 >{{ item.label }}</Option
@@ -82,7 +86,7 @@
                             style="width: 4.54rem"
                         >
                             <Option
-                                v-for="item in cityList"
+                                v-for="item in zhuantai"
                                 :value="item.value"
                                 :key="item.value"
                                 >{{ item.label }}</Option
@@ -91,26 +95,23 @@
                     </div>
                     <div class="item">
                         <b>责任人：</b>
-                        
-                        <Input v-model="form.leadingCadre" placeholder="请输入"  style="width: 4.54rem" />
+
+                        <Input
+                            v-model="form.leading_cadre"
+                            placeholder="请输入"
+                            style="width: 4.54rem"
+                        />
                     </div>
                     <div class="item">
                         <b>协调人：</b>
-                        <Select
+                        <Input
                             v-model="form.coordinator"
-                            clearable
+                            placeholder="请输入"
                             style="width: 4.54rem"
-                        >
-                            <Option
-                                v-for="item in cityList"
-                                :value="item.value"
-                                :key="item.value"
-                                >{{ item.label }}</Option
-                            >
-                        </Select>
+                        />
                     </div>
                 </div>
-                <Button type="primary">查询</Button>
+                <Button type="primary" @click="seach">查询</Button>
             </div>
             <div class="tablebox1">
                 <div class="top1">
@@ -177,20 +178,19 @@
                         </template>
                     </Table>
                     <div class="botm">
-                    <Page
-                        :total="count"
-                        :page-size-opts="[6, 9, 12]"
-                        :page-size="size"
-                        show-total
-                        show-elevator
-                        show-sizer
-                        placement="top"
-                        @on-change="goye"
-                        @on-page-size-change="numb"
-                    />
+                        <Page
+                            :total="count"
+                            :page-size-opts="[6, 9, 12]"
+                            :page-size="size"
+                            show-total
+                            show-elevator
+                            show-sizer
+                            placement="top"
+                            @on-change="goye"
+                            @on-page-size-change="numb"
+                        />
+                    </div>
                 </div>
-                </div>
-                
             </div>
         </div>
     </div>
@@ -209,28 +209,51 @@ export default {
         return {
             hig: 0,
             count: 0,
-            size:6,
-            page:1,
+            size: 6,
+            page: 1,
             index: 0,
-            zheren:[],
-            form:{
-                source:"",//来源
-                release_time:"",
-                prescription_type:"",
-                completion_status:"",
-                executive_department:"",
-                leading_cadre:"",
-                coordination_department:"",
-                coordinator:""
+            zheren: [],
+            xietiao:[],
+            form: {
+                source: "", //来源
+                release_time: "",
+                prescription_type: "",
+                completion_status: "",
+                executive_department: "",
+                leading_cadre: "",
+                coordination_department: "",
+                coordinator: "",
             },
-            type:[
+            type: [
                 {
-                    value:"非时效",
-                    label:"非时效"
-                },{
-                    value:"时效",
-                    label:"时效"
-                }
+                    value: "非时效",
+                    label: "非时效",
+                },
+                {
+                    value: "时效",
+                    label: "时效",
+                },
+            ],
+            zhuantai:[
+               {
+                   value:"未提交",
+                   label:"未提交"
+               },{
+                   value:"已提交",
+                   label:"已提交",
+               },{
+                value:"进行中",
+                label:"进行中",
+               },{
+                   value:"完成",
+                   label:"完成",
+               },{
+                   value:"遵照执行",
+                   label:"遵照执行",
+               },{
+                   value:"延期",
+                   label:"延期",
+               }
             ],
             cityList: [
                 {
@@ -254,7 +277,7 @@ export default {
                     label: "不符合",
                 },
             ],
-            
+
             columns1: [
                 {
                     title: "序号",
@@ -350,11 +373,23 @@ export default {
     watch: {},
     //方法集合
     methods: {
-        async bumen(){//
-           let data=await ajax("http://192.168.0.90:8011/sys-dept/findDepartmentHead",{
-               name:this.form.executiveDepartment
-           },"get");
-           console.log(data)
+        async bumen() {
+            //请求回来的部门数据
+            let data = await ajax(
+                "http://192.168.0.91:8080/sys-dept/findDepartmentHead",
+                {
+                    id: this.form.executiveDepartment,
+                },
+                "get"
+            );
+            console.log(data.data.username);
+            this.form.leading_cadre = data.data.username;
+        },
+        async xietiaofn(){
+            let data=await ajax("http://192.168.0.91:8080/sys-dept/findDepartmentHead",{
+                id:this.form.coordinationDepartment
+            },"get");
+            this.form.coordinator=data.data.username;
         },
         fn(data) {
             //获取时间的方法
@@ -373,36 +408,54 @@ export default {
             this.index = b;
             console.log(a);
         },
-        async getdata(pageNum=1,pageSize=6) {
-            let res=await ajax(
-                "http://192.168.0.90:8011/dh-executive-tracking/searchExecutiveTracking",
+        async getdata(pageNum = 1, pageSize = 6) {
+            //定义一个分页方法
+            let res = await ajax(
+                "http://192.168.0.91:8080/dh-executive-tracking/searchExecutiveTracking",
                 {
                     pageNum,
                     pageSize,
                 },
                 "post"
-            )
-                this.count= parseInt(res.data.pageInfo.total)
-                let arr = res.data.pageInfo.list;
-                arr.forEach((item, index) => {
-                    item["id"] = index + 1;
-                });
-                this.data1 = arr;//获取数据
-            let bumen=await ajax("http://192.168.0.91:8080/sys-dept/searchDepartmentName",{},"post")
-            // console.log(bumen.data.names)
-            this.zheren=bumen.data.names
+            );
+            this.count = parseInt(res.data.pageInfo.total);
+            let arr = res.data.pageInfo.list;
+            arr.forEach((item, index) => {//给数组对象的加个新字段
+                item["id"] = index + 1;
+            });
+            this.data1 = arr; //获取数据
+            if (sessionStorage.getItem("bumen")) {
+                this.xietiao=this.zheren = JSON.parse(sessionStorage.getItem("bumen"));
+            } else {
+                let bumen = await ajax(
+                    "http://192.168.0.91:8080/sys-dept/searchDepartmentName",
+                    {},
+                    "post"
+                );
+                console.log(bumen);
+                // console.log(bumen.data.names)
+                sessionStorage.setItem(
+                    "bumen",
+                    JSON.stringify(bumen.data.names)
+                );
+                this.xietiao=this.zheren = bumen.data.names;
+            }
         },
         goye(e) {
-            this.page=e;
-            this.getdata(this.page,this.size)
+            this.page = e;
+            this.getdata(this.page, this.size);
         },
         numb(e) {
-            this.size=e;
-            this.getdata(this.page,this.size)
+            this.size = e;
+            this.getdata(this.page, this.size);
         },
-        start(date){//获取日期的方法
-            console.log(date)
-            this.form.release_time=date;
+        start(date) {
+            //获取日期的方法
+            console.log(date);
+            this.form.release_time = date;
+        },
+       async seach(){//检索的方法
+          console.log(this.form)
         }
     },
     beforeCreate() {}, //生命周期 - 创建之前
@@ -504,16 +557,14 @@ export default {
                 .ivu-table-wrapper {
                     overflow: visible;
                 }
-                .botm{
+                .botm {
                     display: flex;
                     justify-content: flex-end;
                     width: 97%;
                     margin-top: 0.5rem;
                 }
-                
             }
         }
     }
 }
-
 </style>

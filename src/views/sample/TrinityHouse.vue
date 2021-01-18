@@ -11,11 +11,11 @@
                     <div>
                         <span>船名:</span>
                         <Select
-                            v-model="form.dhVoybebVoyage.voyageNo"
+                            v-model="form.dhVoybebVoyage.vesselNo"
                             style="width: 4.2rem"
                         >
                             <Option
-                                v-for="item in cityList"
+                                v-for="item in cm"
                                 :value="item.value"
                                 :key="item.value"
                                 >{{ item.label }}</Option
@@ -29,7 +29,7 @@
                             style="width: 4.2rem"
                         >
                             <Option
-                                v-for="item in cityList"
+                                v-for="item in hx"
                                 :value="item.value"
                                 :key="item.value"
                                 >{{ item.label }}</Option
@@ -38,24 +38,27 @@
                     </div>
                     <div>
                         <span>海务主管：</span>
-                        <Input
-                            v-model="form.dhVoybebVoyage.maritimeOfficer"
-                            placeholder="请输入..."
-                            clearable
-                            style="width: 4.2rem"
-                        />
+                        
+                        <Select
+                v-model="form.dhVoybebVoyage.maritimeOfficer"
+                style="width: 4.2rem"
+                filterable
+                :remote-method="remoteMethod1"
+                :loading="loading1">
+                <Option v-for="(option, index) in zg" :value="option.value" :key="index">{{option.label}}</Option>
+            </Select>
                     </div>
                     <div class="yue">
                         <span>月份范围：</span>
                         <DatePicker
-                            type="date"
+                            type="datetime"
                             placeholder="__年__月__日"
                             style="width: 4.2rem"
                             @on-change="start"
                         ></DatePicker>
                         <div class="kong"></div>
                         <DatePicker
-                            type="date"
+                            type="datetime"
                             placeholder="__年__月__日"
                             style="width: 4.2rem"
                             @on-change="end"
@@ -120,7 +123,7 @@ export default {
             form: {
                 //表单的数据双向数据绑定
                 dhVoybebVoyage: {
-                    voyageNo: "",
+                    vesselNo: "",
                     route: "",
                     maritimeOfficer: "",
                 },
@@ -129,6 +132,9 @@ export default {
                 limit: 10,
                 page: 1,
             },
+            cm:[],
+            hx:[],
+            zg:[],
             cityList: [
                 {
                     value: "New York",
@@ -155,6 +161,7 @@ export default {
                     label: "Canberra",
                 },
             ],
+            loading1:"",
             columns2: [
                 {
                     title: "月份",
@@ -302,14 +309,25 @@ export default {
     watch: {},
     //方法集合
     methods: {
+        math(arr,newarr){
+            arr.forEach(item => {
+                let obj={
+                    label:item,
+                    value:item,
+                }
+                newarr.push(obj)
+            });
+        },
         start(date) {
             //获取开始的时间
             this.form.startTime = date;
         },
         end(date) {
             //获取结束的时间
-            this.form.endTime = date;
-            console.log(this.form);
+            // this.form.endTime = date;
+            this.form.endTime=date
+            // console.log(this.form);
+            
         },
         goupdate(row) {
             //用于路由跳转页面
@@ -358,7 +376,35 @@ export default {
             console.log(arr);
             this.data3 = arr; //将请求的数据赋值给data3变量
         },
+        async getda(){
+           let res=await ajax("/common/getSelectDhVoybebHwsr",{},"get");
+           console.log(res.data)
+          
+           this.zg=res.data.maritimeOfficerList;
+           console.log(res.data.routeList)
+           this.math(res.data.routeList,this.hx)
+           console.log(res.data.vesselNoList)
+           this.math(res.data.vesselNoList,this.cm)
+        },
+        remoteMethod1 (query) {
+                if (query !== '') {
+                    this.loading1 = true;
+                    setTimeout(() => {
+                        this.loading1 = false;
+                        const list = this.zg.map(item => {
+                            return {
+                                value: item,
+                                label: item
+                            };
+                        });
+                        this.zg = list.filter(item => item.label.indexOf(query) > -1);
+                    }, 200);
+                } else {
+                    this.zg = [];
+                }
+            },
         seach() {
+            console.log(this.form)
             this.getdata(this.form);
         },
     },
@@ -372,11 +418,9 @@ export default {
     mounted() {
         this.hig = (window.innerHeight / 3) * 2;
         console.log(new Date());
-        if (sessionStorage.getItem("route")) {//请求航次等下啦框的数据
-            ajax("/common/getSelect", {}, "get").then((data) => {
-                sessionStorage("route", JSON.stringify(data.data.route));
-            });
-        }
+       
+        this.getda()
+        
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后
