@@ -91,7 +91,7 @@
                             :autosize="{ minRows: 5, maxRows: 9 }"
                         />
                         <div class="updata">
-                            <Upload
+                            <!-- <Upload
                                 action="//jsonplaceholder.typicode.com/posts/"
                                 :default-file-list="defaultList"
                                 :on-success="fn"
@@ -103,9 +103,13 @@
                                         >上传附件</Button
                                     >
                                 </span>
-                            </Upload>
+                            </Upload> -->
+                            <h4>附件:</h4>
+                            <p v-for="(item,index) in defaultList" :key="index" style="margin-top:0.3rem">
+                                <a :href="item.fileUrl" :title="item.attachmentsName" :download="item.attachmentsName"  >{{item.attachmentsName}}</a>
+                            </p>
                         </div>
-                        <p class="text">已确认部门:<b>12</b></p>
+                        <p class="text">已确认部门:<b>{{totle}}</b></p>
                     </div>
                     <div class="botm">
                         <Button
@@ -132,6 +136,7 @@ export default {
         //这里存放数据
         return {
             boss:"",
+            totle:3,
             defaultList: [
                 
             ],
@@ -191,17 +196,20 @@ export default {
             },
             "get"
         ).then((data) => {
-            console.log(data)
+            // console.log(data.data.DeptTotal)
+            this.totle=data.data.DeptTotal
             let arr=data.data.Annex;
-            let newarr=[]
-            for(let i=0;i<arr.length;i++){
-                let obj={
-                    name:arr[i].attachmentsName,
-                    url:"",
-                }
-                newarr.push(obj)
-            }
-            this.defaultList=newarr
+            console.log(arr)
+            this.defaultList=arr
+            // let newarr=[]
+            // for(let i=0;i<arr.length;i++){
+            //     let obj={
+            //         name:arr[i].attachmentsName,
+            //         url:arr[],
+            //     }
+            //     newarr.push(obj)
+            // }
+            // this.defaultList=newarr
             
           this.boss=data.data.Report.pop().reportContent;
             this.data1=data.data.Report
@@ -223,6 +231,7 @@ export default {
 .readhuiyi {
     width: 100%;
     height: 100%;
+   
    
     overflow-x: scroll;
     font-size: 0.42rem;

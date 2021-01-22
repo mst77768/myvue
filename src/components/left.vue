@@ -25,6 +25,14 @@
                 <MenuItem name="2-1" to="huiyi">会议报告</MenuItem>
                 <MenuItem name="2-2" to="rlzz">执行力跟踪</MenuItem>
             </Submenu>
+            <Submenu name="4">
+                <template slot="title">
+                    <Icon type="ios-boat" />
+                    设备管理
+                </template>
+                <MenuItem name="4-1" to="database">数据采集</MenuItem>
+                
+            </Submenu>
         </Menu>
     </div>
 </template>

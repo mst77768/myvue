@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 <div class="table">
-                    <Table stripe :columns="columns1" :data="data1" max-height="hig">
+                    <Table stripe :columns="columns1" :data="data1" :height="hig">
                         <template slot-scope="{ row }" slot="gmtCreate">
                             {{ row.gmtCreate.substring(0, 10) }}
                         </template>
@@ -128,7 +128,7 @@ export default {
             count: 19,//总数
             search: {
                     pageNum: 1,
-                    limit: 12,
+                    limit: 9,
                     begin: "",
                     end: "",
                     reportStatus: "",
@@ -238,7 +238,6 @@ export default {
         dyin(index) {
             this.$Message.info(`打印第${index + 1}行数据`);
         },
-
         golook(row) {
             sessionStorage.setItem("look",JSON.stringify(row));
             if(row.reportType==="周例会"){
@@ -291,7 +290,7 @@ this.$router.push("/readhuiyi")
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
         this.getsearch();
-        this.hig=window.innerHeight / 2;
+        this.hig = window.innerHeight / 2;
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后

@@ -12,7 +12,9 @@
                         <Button type="warning">编辑</Button>
                     </div>
                     <div class="itme2">
-                        <Button type="primary" @click="getpagedata">提交</Button>
+                        <Button type="primary" @click="getpagedata"
+                            >提交</Button
+                        >
                     </div>
                 </div>
                 <div class="banxin">
@@ -20,23 +22,28 @@
                     <div class="formitem">
                         <div class="inputitem">
                             <span>船名：</span>
-                            <Select
+
+                            <Input
                                 v-model="form.vesselNo"
+                                disabled
+                                placeholder="未知"
                                 style="width: 4.54rem"
-                            >
-                            </Select>
+                            />
                         </div>
                         <div class="inputitem">
                             <span>航次号：</span>
-                            <Select
+
+                            <Input
                                 v-model="form.voyageNo"
+                                disabled
+                                placeholder="未知"
                                 style="width: 4.54rem"
-                            >
-                            </Select>
+                            />
                         </div>
                         <div class="inputitem">
                             <span>TC预算：</span>
                             <Input
+                                type="number"
                                 v-model="form.budgetTc"
                                 placeholder="请输入..."
                                 style="width: 4.54rem"
@@ -70,6 +77,7 @@
                         <div>
                             <span>运费：</span>
                             <Input
+                                type="number"
                                 v-model="form.freight"
                                 placeholder="请输入..."
                                 style="width: 4.54rem"
@@ -78,6 +86,7 @@
                         <div>
                             <span>滞期费:</span>
                             <Input
+                                type="number"
                                 v-model="form.demurrage"
                                 placeholder="请输入..."
                                 style="width: 4.54rem"
@@ -86,6 +95,7 @@
                         <div>
                             <span>佣金比例:</span>
                             <Input
+                                type="number"
                                 v-model="form.commissionRatio"
                                 placeholder="请输入..."
                                 style="width: 4.54rem"
@@ -94,6 +104,7 @@
                         <div>
                             <span>其他费用:</span>
                             <Input
+                                type="number"
                                 v-model="form.otherMoney"
                                 placeholder="请输入..."
                                 style="width: 4.54rem"
@@ -103,7 +114,10 @@
                     <p>港使费信息</p>
                     <div class="gangshi">
                         <div class="bb">
-                            <div v-for="(item, key) in form.dhVoybebPortCharges" :key="key">
+                            <div
+                                v-for="(item, key) in form.dhVoybebPortCharges"
+                                :key="key"
+                            >
                                 <div class="flist" v-if="!item.assignmentStyle">
                                     <span>装港{{ item.portName }}港使费:</span>
                                     <Input
@@ -115,7 +129,10 @@
                             </div>
                         </div>
                         <div class="bb">
-                            <div v-for="(item, key) in form.dhVoybebPortCharges" :key="key">
+                            <div
+                                v-for="(item, key) in form.dhVoybebPortCharges"
+                                :key="key"
+                            >
                                 <div class="flist" v-if="item.assignmentStyle">
                                     <span>卸港{{ item.portName }}港使费:</span>
                                     <Input
@@ -149,19 +166,21 @@
                                 <div>
                                     <span>offhire开始时间:</span>
                                     <DatePicker
-                                        type="date"
+                                        type="datetime"
                                         :value="form.offhireStartTime"
                                         placeholder="__年__月__日"
                                         style="width: 4.54rem"
+                                        @on-change="date01"
                                     ></DatePicker>
                                 </div>
                                 <div>
                                     <span>offhire结束时间:</span>
                                     <DatePicker
-                                        type="date"
+                                        type="datetime"
                                         :value="form.offhireEndTime"
                                         placeholder="__年__月__日"
                                         style="width: 4.54rem"
+                                        @on-change="date02"
                                     ></DatePicker>
                                 </div>
                             </div>
@@ -169,19 +188,21 @@
                                 <div>
                                     <span>间接offhire开始时间:</span>
                                     <DatePicker
-                                        type="date"
+                                        type="datetime"
                                         :value="form.indirectOffhireStartTime"
                                         placeholder="__年__月__日"
                                         style="width: 4.54rem"
+                                        @on-change="date03"
                                     ></DatePicker>
                                 </div>
                                 <div>
                                     <span>间接offhire结束时间:</span>
                                     <DatePicker
-                                        type="date"
-                                        :value="form.indirectOffhireStartTime"
+                                        type="datetime"
+                                        :value="form.indirectOffhireEndTime"
                                         placeholder="__年__月__日"
                                         style="width: 4.54rem"
+                                        @on-change="date04"
                                     ></DatePicker>
                                 </div>
                             </div>
@@ -207,19 +228,21 @@
                                 <div>
                                     <span>营运时间加油船舶抵达锚地时间:</span>
                                     <DatePicker
-                                        type="date"
+                                        type="datetime"
                                         :value="form.droppedAnchor"
                                         placeholder="__年__月__日"
                                         style="width: 4.54rem"
+                                        @on-change="date05"
                                     ></DatePicker>
                                 </div>
                                 <div>
                                     <span>营运时间加油结束时间:</span>
                                     <DatePicker
-                                        type="date"
+                                        type="datetime"
                                         :value="form.refuelingShipEndTime"
                                         placeholder="__年__月__日"
                                         style="width: 4.54rem"
+                                        @on-change="date06"
                                     ></DatePicker>
                                 </div>
                             </div>
@@ -244,7 +267,7 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-import ajax from "@/api/ajax.js"
+import ajax from "@/api/ajax.js";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
@@ -254,7 +277,7 @@ export default {
             form: {},
             phone: "false",
             phone1: "false",
-            
+
             cityList: [],
             model1: "",
         };
@@ -266,9 +289,41 @@ export default {
     //方法集合
     methods: {
         getpagedata() {
-               ajax("/dhVoybebHwsr/submitDhVoybebHwsr",this.form,"post").then(data=>{
-                   console.log(data)
-               })
+            ajax("/dhVoybebHwsr/submitDhVoybebHwsr", this.form, "post").then(
+                (data) => {
+                    console.log(data)
+                    if (data.ok) {
+                        this.$Message["success"]({
+                            background: true,
+                            content: "提交成功！",
+                        });
+                        this.$router.push("/Trintyhouse");
+                    }else{
+                        this.$Message["error"]({
+                            background: true,
+                            content: "提交失败！",
+                        });
+                    }
+                }
+            );
+        },
+        date01(time) {
+            this.form.offhireStartTime = time;
+        },
+        date02(time) {
+            this.form.offhireEndTime = time;
+        },
+        date03(time) {
+            this.form.indirectOffhireStartTime = time;
+        },
+        date04(time) {
+            this.form.indirectOffhireStartTime = time;
+        },
+        date05(time) {
+            this.form.droppedAnchor = time;
+        },
+        date06(time) {
+            this.form.refuelingShipEndTime = time;
         },
     },
     beforeCreate() {}, //生命周期 - 创建之前
@@ -370,14 +425,13 @@ export default {
                         width: 100%;
                     }
                     div {
-                        
                         .flist {
                             margin-right: 3rem;
                             margin-bottom: 1rem;
                         }
                         div {
                             span {
-                               margin-right: 0.5rem;
+                                margin-right: 0.5rem;
                             }
                         }
                     }

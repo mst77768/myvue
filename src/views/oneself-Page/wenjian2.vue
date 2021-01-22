@@ -27,7 +27,7 @@
                     </template>
                 </Table>
                 <div class="botm">
-                    <Upload action="//jsonplaceholder.typicode.com/posts/"  :default-file-list="defaultList" :on-success="fn">
+                    <Upload action="http://192.168.0.90:8011/dh-annex-table/file" :on-remove="wjremove" :data="da" :on-progress="wjread" :default-file-list="defaultList" :on-success="fn">
                         <Button type="info" icon="ios-cloud-upload-outline"
                             >上传附件</Button
                         >
@@ -52,6 +52,12 @@ export default {
     data() {
         //这里存放数据
         return {
+            da:{//传给后端的资源
+               meetingDate:"2020-01-20",
+               reportName:"测试一",
+               uid:"",
+
+            },
             flag:true,
             defaultList: [
                    
@@ -111,6 +117,16 @@ export default {
             setTimeout(()=>{
                 this.$router.go(-1);
             },1000)
+        },
+        wjremove(file,filelist){
+            console.log(file)
+            console.log(filelist)
+        },
+        wjread(a,b,c){
+            console.log(a)
+            console.log(b.uid);
+            this.da.uid=b.uid;
+            console.log(c)
         }
     },
     beforeCreate() {}, //生命周期 - 创建之前
@@ -123,8 +139,12 @@ export default {
     mounted() {
         //拿到上个页面传过来的索引
         let arr = JSON.parse(sessionStorage.getItem("data"));
-        console.log(arr)
-        let ojb = arr[this.$route.query.text];
+         console.log(arr)
+         let obj=arr[this.$route.query.text];
+        let ojb = {
+            name:obj.completionStatus,
+            tile:obj.informationNote   
+        }
         this.models = ojb.wczt;
     },
     beforeUpdate() {}, //生命周期 - 更新之前

@@ -10,7 +10,7 @@
                 <div class="top">
                     <div class="npm nb">
                         <span>船名: </span>
-                        <Select v-model="form.dhVoybebVoyage.vesselNo" style="width: 4.5rem">
+                        <Select v-model="form.dhVoybebVoyage.vesselNo" clearable style="width: 4.5rem">
                             <Option
                                 v-for="item in cm"
                                 :value="item.value"
@@ -21,7 +21,7 @@
                     </div>
                     <div class="nb">
                         <span>航线: </span>
-                        <Select v-model="form.dhVoybebVoyage.route" style="width: 4.5rem">
+                        <Select v-model="form.dhVoybebVoyage.route" clearable style="width: 4.5rem">
                             <Option
                                 v-for="item in hx"
                                 :value="item.value"
@@ -32,19 +32,27 @@
                     </div>
                     <div class="nb">
                         <span>船队总管: </span>
-                        <Input
-                            v-model="form.dhVoybebVoyage.fleetManager"
-                            placeholder="请输入..."
-                            clearable
-                        />
+                        
+                        <Select v-model="form.dhVoybebVoyage.fleetManager" clearable style="width: 4.5rem">
+                            <Option
+                                v-for="item in cd"
+                                :value="item.value"
+                                :key="item.value"
+                                >{{ item.label }}</Option
+                            >
+                        </Select>
                     </div>
                     <div class="nb">
                         <span> 海务主管: </span>
-                        <Input
-                            v-model="form.dhVoybebVoyage.maritimeOfficer"
-                            placeholder="请输入..."
-                            clearable
-                        />
+                        
+                         <Select v-model="form.dhVoybebVoyage.maritimeOfficer" clearable style="width: 4.5rem">
+                            <Option
+                                v-for="item in hw"
+                                :value="item.value"
+                                :key="item.value"
+                                >{{ item.label }}</Option
+                            >
+                        </Select>
                     </div>
                     <div class="nb">
                         <span>时间范围: </span>
@@ -59,7 +67,7 @@
                             placeholder="__年__月_日"
                             @on-change="end"
                         ></DatePicker>
-                        <Button type="primary">查询</Button>
+                        <Button type="primary" @click="search">查询</Button>
                     </div>
                 </div>
             </div>
@@ -67,7 +75,7 @@
             <div class="sumbox">
                 <div class="contrleft">
                     <div class="hsum">航次总数: {{voyageSum}}</div>
-                    <div class="Tc">TC损失:{{tcSum}}美金</div>
+                    <div class="Tc">TC损失:{{Number(tcSum)}}美金</div>
                 </div>
                 <div><Button type="warning" @click="updta">导出</Button></div>
             </div>
@@ -317,6 +325,17 @@ export default {
         },
         end(data){
           this.form.endTime=data;
+        },
+       async search(){
+            this.form.limit=this.limit;
+            this.form.page=1;
+            let res=await ajax("/contributionSummary/getDhVoybebContributionSummary",this.form,"post");
+            console.log(res)
+            this.voyageSum=res.data.voyageSum;
+            this.tcSum=res.data.tcSum
+            this.data1=res.data.ContributionSummarys;
+            this.count=res.data.voyageSum;
+            
         }
     },
     beforeCreate() {}, //生命周期 - 创建之前

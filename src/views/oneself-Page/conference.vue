@@ -7,14 +7,15 @@
                 <div class="itme">
                     <span>来源：</span>
                     <Select
-                        v-model="smode1"
+                        v-model="form.source"
                         clearable
                         style="width: 160px"
                         aria-placeholder="请选择"
+                        @on-change="liayuan"
                     >
                         <Option
                             v-for="item in select1"
-                            :value="item.value"
+                            :value="item.label"
                             :key="item.value"
                             >{{ item.label }}</Option
                         >
@@ -23,13 +24,14 @@
                 <div class="itme">
                     <span>会议报告：</span>
                     <Select
-                        v-model="smode2"
+                        v-model="form.reportName"
                         clearable
                         style="width: 280px"
                         aria-placeholder="请选择"
+                        @on-change="baogao"
                     >
                         <Option
-                            v-for="item in select2[smode1]"
+                            v-for="item in huiyiarr"
                             :value="item.value"
                             :key="item.value"
                             >{{ item.label }}</Option
@@ -38,14 +40,27 @@
                 </div>
                 <div class="itme">
                     <span>发布日期：</span>
-                    <DatePicker
+                    <!-- <DatePicker
                         type="date"
                         placeholder=" 年/月/日"
                         style="width: 190px"
-                    ></DatePicker>
+                    ></DatePicker> -->
+                    <Select
+                        v-model="form.meetingDate"
+                        clearable
+                        style="width: 280px"
+                        aria-placeholder="请选择"
+                    >
+                        <Option
+                            v-for="item in datearr"
+                            :value="item.value"
+                            :key="item.value"
+                            >{{ item.label }}</Option
+                        >
+                    </Select>
                 </div>
                 <div class="item">
-                    <Button type="info">添加</Button>
+                    <Button type="info" @click="addw">添加</Button>
                 </div>
             </div>
             <div class="tablebox">
@@ -55,6 +70,7 @@
                     :data="data1"
                     width="100%"
                     height="600"
+                    @on-row-click="row"
                 >
                     <template slot-scope="{ row }" slot="address">
                         <span v-if="!row.flag">
@@ -76,29 +92,19 @@
                             clearable
                             style="width: 130px"
                             aria-placeholder="请选择"
+                            @on-change="select"
                         >
                             <Option
                                 v-for="item in row.a.seleitem"
-                                :value="item.value"
-                                :key="item.value"
+                                :value="item.label"
+                                :key="item.label"
                                 >{{ item.label }}</Option
                             >
                         </Select>
                     </template>
                     <template slot-scope="{ row, index }" slot="b">
-                        <Select
-                            v-model="data1[index].b.selsemode1"
-                            clearable
-                            style="width: 130px"
-                            aria-placeholder="请选择"
-                        >
-                            <Option
-                                v-for="item in row.b.seleitem"
-                                :value="item.value"
-                                :key="item.value"
-                                >{{ item.label }}</Option
-                            >
-                        </Select>
+                        
+                        <Input v-model="data1[index].b.selsemode1" placeholder="请选择..." clearable style="width: 130px" />
                     </template>
                     <template slot-scope="{ row, index }" slot="c">
                         <Select
@@ -106,29 +112,18 @@
                             clearable
                             style="width: 130px"
                             aria-placeholder="请选择"
+                            @on-change="selectc"
                         >
                             <Option
                                 v-for="item in row.c.seleitem"
-                                :value="item.value"
-                                :key="item.value"
+                                :value="item.label"
+                                :key="item.label"
                                 >{{ item.label }}</Option
                             >
                         </Select>
                     </template>
                     <template slot-scope="{ row, index }" slot="d">
-                        <Select
-                            v-model="data1[index].d.selsemode1"
-                            clearable
-                            style="width: 130px"
-                            aria-placeholder="请选择"
-                        >
-                            <Option
-                                v-for="item in row.d.seleitem"
-                                :value="item.value"
-                                :key="item.value"
-                                >{{ item.label }}</Option
-                            >
-                        </Select>
+                         <Input v-model="data1[index].d.selsemode1" placeholder="请选择..." clearable style="width: 130px" />
                     </template>
                     <template slot-scope="{ row, index }" slot="e">
                         <Select
@@ -150,7 +145,7 @@
                             <DatePicker
                                 type="date"
                                 @on-change="fn"
-                                @click="hh(index)"
+                                
                                 placeholder="/年/月/日"
                                 style="width: 130px"
                             ></DatePicker>
@@ -189,13 +184,21 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import ajax from "@/api/ajax.js";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
     data() {
         //这里存放数据
         return {
+            form:{
+               source:"月度会议",
+               meetingDate:"",
+               reportName:""
+            },
+            huiyiarr:[],
+            datearr:[],
+            index:0,
             textarea: "",
             columns1: [
                 {
@@ -253,635 +256,18 @@ export default {
                     width: 160,
                 },
             ],
-            data1: [
-                {
-                    name: "1",
-                    address:
-                        "当前公司首要任务是确保公司员工特别是船员避免受到新冠疫情侵害。要求船员部高度重视，建立健全相关制度，采取一切可行措施保证船员尽量避免与外界接触，适时监控船舶执行情况，每日在公司微信群发布“船员防疫监控日报”。",
-                    a: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "海员部",
-                                label: "海员部",
-                            },
-                            {
-                                value: "海务部",
-                                label: "海务部",
-                            },
-                            {
-                                value: "数据化研发中心",
-                                label: "数据化研发中心",
-                            },
-                            {
-                                value: "财务部",
-                                label: "财务部",
-                            },
-                        ],
-                    },
-                    b: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    c: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    d: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    e: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    f: {
-                        data: "",
-                    },
-                    g: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                },
-                {
-                    name: "2",
-                    address:
-                        "目前，整个国家正在处在危机中。如果疫情短时间不能好转，将会有大量民营企业企业破产，鼎衡也会面临重大困难。我们必须做好三个月（即直到5月底）才能恢复正常的准备。",
-                    a: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "海员部",
-                                label: "海员部",
-                            },
-                            {
-                                value: "海务部",
-                                label: "海务部",
-                            },
-                            {
-                                value: "数据化研发中心",
-                                label: "数据化研发中心",
-                            },
-                            {
-                                value: "财务部",
-                                label: "财务部",
-                            },
-                        ],
-                    },
-                    b: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    c: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    d: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    e: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    f: {
-                        data: "",
-                    },
-                    g: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                },
-                {
-                    name: "3",
-                    address:
-                        "装载易凝固货物船舶加装伴温管解决防冻问题，10月份之前全部完成",
-                    a: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "海员部",
-                                label: "海员部",
-                            },
-                            {
-                                value: "海务部",
-                                label: "海务部",
-                            },
-                            {
-                                value: "数据化研发中心",
-                                label: "数据化研发中心",
-                            },
-                            {
-                                value: "财务部",
-                                label: "财务部",
-                            },
-                        ],
-                    },
-                    b: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    c: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    d: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    e: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    f: {
-                        data: "",
-                    },
-                    g: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                },
-                {
-                    name: "4",
-                    address:
-                        "最近这几艘船舶报表主机平均转速均达不到115转左右，远低于设计转速。要弄明白为什么？用主机健康管理程序中的表格进行分析，判断是主机是否处于健康状态，或污底或螺旋桨问题。脱开轴发只是权宜之计，根本解决办法还是要让船舶恢复到试航状态。目前油价很低，船舶能够开快一点对效益提升立竿见影。要想方设法发掘主机潜力，合理配载，增加航速。",
-                    a: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "海员部",
-                                label: "海员部",
-                            },
-                            {
-                                value: "海务部",
-                                label: "海务部",
-                            },
-                            {
-                                value: "数据化研发中心",
-                                label: "数据化研发中心",
-                            },
-                            {
-                                value: "财务部",
-                                label: "财务部",
-                            },
-                        ],
-                    },
-                    b: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    c: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    d: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    e: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                    f: {
-                        data: "",
-                    },
-                    g: {
-                        selsemode1: "",
-                        seleitem: [
-                            {
-                                value: "月度会议",
-                                label: "月度会议",
-                            },
-                            {
-                                value: "周例会",
-                                label: "周例会",
-                            },
-                            {
-                                value: "邮件",
-                                label: "邮件",
-                            },
-                            {
-                                value: "微信",
-                                label: "微信",
-                            },
-                            {
-                                value: "不符合",
-                                label: "不符合",
-                            },
-                        ],
-                    },
-                },
-            ],
+            data1: [],
             select1: [
                 {
-                    value: 0,
+                    value: "月度会议",
                     label: "月度会议",
                 },
                 {
-                    value: 1,
+                    value: "周例会",
                     label: "周例会",
                 },
                 {
-                    value: 2,
+                    value: "其他会议",
                     label: "其他会议",
                 },
             ],
@@ -948,8 +334,9 @@ export default {
                 ],
             ],
             flag: true,
-            index: 0,
+            
         };
+        
     },
     //监听属性 类似于data概念
     computed: {},
@@ -958,179 +345,24 @@ export default {
     //方法集合
     methods: {
         add() {
-            let obj = {
-                name: "1",
-                address:
-                    "当前公司首要任务是确保公司员工特别是船员避免受到新冠疫情侵害。要求船员部高度重视，建立健全相关制度，采取一切可行措施保证船员尽量避免与外界接触，适时监控船舶执行情况，每日在公司微信群发布“船员防疫监控日报”。",
-                a: {
-                    selsemode1: "",
-                    seleitem: [
-                        {
-                            value: "海员部",
-                            label: "海员部",
-                        },
-                        {
-                            value: "海务部",
-                            label: "海务部",
-                        },
-                        {
-                            value: "数据化研发中心",
-                            label: "数据化研发中心",
-                        },
-                        {
-                            value: "财务部",
-                            label: "财务部",
-                        },
-                    ],
-                },
-                b: {
-                    selsemode1: "",
-                    seleitem: [
-                        {
-                            value: "月度会议",
-                            label: "月度会议",
-                        },
-                        {
-                            value: "周例会",
-                            label: "周例会",
-                        },
-                        {
-                            value: "邮件",
-                            label: "邮件",
-                        },
-                        {
-                            value: "微信",
-                            label: "微信",
-                        },
-                        {
-                            value: "不符合",
-                            label: "不符合",
-                        },
-                    ],
-                },
-                c: {
-                    selsemode1: "",
-                    seleitem: [
-                        {
-                            value: "月度会议",
-                            label: "月度会议",
-                        },
-                        {
-                            value: "周例会",
-                            label: "周例会",
-                        },
-                        {
-                            value: "邮件",
-                            label: "邮件",
-                        },
-                        {
-                            value: "微信",
-                            label: "微信",
-                        },
-                        {
-                            value: "不符合",
-                            label: "不符合",
-                        },
-                    ],
-                },
-                d: {
-                    selsemode1: "",
-                    seleitem: [
-                        {
-                            value: "月度会议",
-                            label: "月度会议",
-                        },
-                        {
-                            value: "周例会",
-                            label: "周例会",
-                        },
-                        {
-                            value: "邮件",
-                            label: "邮件",
-                        },
-                        {
-                            value: "微信",
-                            label: "微信",
-                        },
-                        {
-                            value: "不符合",
-                            label: "不符合",
-                        },
-                    ],
-                },
-                e: {
-                    selsemode1: "",
-                    seleitem: [
-                        {
-                            value: "月度会议",
-                            label: "月度会议",
-                        },
-                        {
-                            value: "周例会",
-                            label: "周例会",
-                        },
-                        {
-                            value: "邮件",
-                            label: "邮件",
-                        },
-                        {
-                            value: "微信",
-                            label: "微信",
-                        },
-                        {
-                            value: "不符合",
-                            label: "不符合",
-                        },
-                    ],
-                },
-                f: {
-                    data: "",
-                },
-                g: {
-                    selsemode1: "",
-                    seleitem: [
-                        {
-                            value: "月度会议",
-                            label: "月度会议",
-                        },
-                        {
-                            value: "周例会",
-                            label: "周例会",
-                        },
-                        {
-                            value: "邮件",
-                            label: "邮件",
-                        },
-                        {
-                            value: "微信",
-                            label: "微信",
-                        },
-                        {
-                            value: "不符合",
-                            label: "不符合",
-                        },
-                    ],
-                },
-            };
-            if (this.flag) {
-                obj.name = (this.data1.length + 1).toString();
-                obj.flag = true;
-                this.data1.push(obj);
-                this.flag = false;
-            } else {
-                this.$Notice.info({
-                    title: "系统提醒！",
-                    desc: "你上条数据未操作完成！",
-                });
-            }
+            
+            // if (this.flag) {
+            //     obj.name = (this.data1.length + 1).toString();
+            //     obj.flag = true;
+            //     this.data1.push(obj);
+            //     this.flag = false;
+            // } else {
+            //     this.$Notice.info({
+            //         title: "系统提醒！",
+            //         desc: "你上条数据未操作完成！",
+            //     });
+            // }
         },
-        fn(a) {
+        fn(a) {//获取时间
             //这个方法是设置对应的索引的
             console.log(a);
             console.log(this.data1[this.index].f.data);
-            this.data1[this.index].f.data = a;
-            // console.log(this.data1[this.index].f.data);
-            console.log(this.data1);
+            this.data1[this.index].f.selsemode1 = a;    
         },
         bg(index) {
             //修改当前的索引看到哪一行了
@@ -1139,20 +371,42 @@ export default {
         },
         tijiao() {
             //提交按钮的事件
-            if (!this.flag) {
-                let index = this.data1.length - 1;
-                this.data1[index].address = this.textarea;
-                this.textarea = "";
-                this.data1[index].flag = false;
-                this.flag = true;
-                this.$Notice.success({
-                    title: "系统提醒！",
-                    desc: "提交成功！小伙子！",
-                });
-            }
-            setTimeout(() => {
-                this.$router.go(-1);
-            }, 1000);
+            // if (!this.flag) {
+            //     let index = this.data1.length - 1;
+            //     this.data1[index].address = this.textarea;
+            //     this.textarea = "";
+            //     this.data1[index].flag = false;
+            //     this.flag = true;
+            //     this.$Notice.success({
+            //         title: "系统提醒！",
+            //         desc: "提交成功！小伙子！",
+            //     });
+            // }
+            // setTimeout(() => {
+            //     this.$router.go(-1);
+            // }, 1000);
+            console.log(this.data1)
+            let arr=[];
+            this.data1.forEach(item=>{
+                let obj={
+                    executiveDepartment:item.a.selsemode1,//责任部门
+                    leadingCadre:item.b.selsemode1,//责任人
+                    meetingDate:this.form.meetingDate,//会议时间
+                    prescriptionType:Boolean(item.e.selsemode1),//时效类型
+                    reportName:item.reportName,//报告名称
+                    reportingFrequency:item.g.selsemode1,//频率
+                    requiredCompletionTime:item.f.selsemode1,//要求完成时间
+                    coordinationDepartment:item.c.selsemode1,//协调部门
+                    coordinator:item.d.selsemode1,//协调人
+                    executionContent:item.address,//总裁指示
+                    source:this.form.source
+                };
+                arr.push(JSON.parse(JSON.stringify(obj)))
+            });
+            ajax("http://192.168.0.91:8080/dh-executive-tracking/saveExecutiveTrackingContent",arr,"post").then(res=>{
+                console.log(res.data)
+            })
+            
         },
         quxiao() {
             //取消按钮的事件
@@ -1164,10 +418,127 @@ export default {
                 this.$router.go(-1);
             }, 1000);
         },
+        liayuan(value){
+            ajax("http://192.168.0.91:8080/dh-executive-tracking/searchExecutiveTitle",{
+               source:value
+            },"post").then(res=>{
+               this.form.reportName=res.data.reportName[0].value
+               this.huiyiarr=res.data.reportName
+            })
+        },
+        baogao(value){
+            ajax("http://192.168.0.91:8080/dh-executive-tracking/searchTrackingTitle",{
+               reportName:value 
+            },"post").then(res=>{
+                this.form.meetingDate=res.data.meetingDate[0].value
+                console.log(res.data.meetingDate)
+                this.datearr=res.data.meetingDate
+            })
+        },
+        async addw(){
+            this.data1=[];
+            let res2=await ajax("http://192.168.0.91:8080/dh-executive-tracking/saveExecutiveTrackingInstructions",this.form,"post");
+            console.log(res2);
+            let arr=[];
+            arr=res2.data.instructionsVoList;
+            console.log(arr)
+            let seleitem=sessionStorage.getItem("bumen")
+            let obj={
+                name:'',//序号
+                address:"",//仲裁指示
+                a:{
+                    selsemode1: "",
+                    seleitem: JSON.parse(seleitem),
+                },
+                b:{
+                    selsemode1: "",
+                },
+                c:{
+                    selsemode1: "",
+                    seleitem: JSON.parse(seleitem),
+                },
+                d:{
+                    selsemode1: "",
+                },
+                e:{
+                    selsemode1: "",
+                    seleitem: [
+                        {
+                            value:0,
+                            label:"非时效",
+                        },{
+                            value:1,
+                            label:"时效"
+                        }
+                    ],
+                },
+                f:{//要求完成的时间
+                    selsemode1: "",
+                },
+                g:{
+                    selsemode1: "",
+                    seleitem: [
+                        {
+                            value: "每日",
+                            label: "每日",
+                        },{
+                            value: "周末",
+                            label: "周末",
+                        },{
+                            value: "月末",
+                            label: "月末",
+                        }
+                    ],
+                }
+            };
+            // arr.foreach((item,index)=>{
+            //     obj.name=Number(index+1);
+            //     obj.address=item.executionContent
+            //     obj.meetingDate=item.meetingDate,
+            //     obj.reportName=item.reportName
+            //     this.data1.push(obj)
+            // })
+            for(let i=0;i<arr.length;i++){
+                obj.name=Number(i+1);
+                obj.address=arr[i].executionContent;
+                obj.reportName=arr[i].reportName
+                this.data1.push(JSON.parse(JSON.stringify(obj)))
+            }
+            
+            console.log(arr)
+
+        },
+       async select(value){
+           console.log(value)
+           let res=await ajax("http://192.168.0.91:8080/sys-dept/findDepartmentHead",{
+               name:value
+           },"get");
+           console.log(res.data.username)
+           this.data1[this.index].b.selsemode1=res.data.username
+        },
+        async selectc(value){
+           let res=await ajax("http://192.168.0.91:8080/sys-dept/findDepartmentHead",{
+               name:value
+           },"get");
+           console.log(res.data.username)
+           this.data1[this.index].d.selsemode1=res.data.username
+        },
+        row(item,index){//单击表格某一行
+           console.log(item)
+           console.log(index)
+           this.index=index
+        }
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
-    created() {},
+    created() {
+        ajax("http://192.168.0.91:8080/dh-executive-tracking/searchExecutiveTitle",{
+            source:this.form.source
+        },"post").then(res=>{
+            console.log(res.data.reportName)
+            this.huiyiarr=res.data.reportName
+        })
+    },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {},

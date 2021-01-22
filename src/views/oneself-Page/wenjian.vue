@@ -13,14 +13,12 @@
                                 :key="item.value"
                                 >{{ item.label }}</Option
                             >
-                           
                         </Select>
                          <i>{{row.name}}</i>
                     </template>
                 </Table>
                 <div class="botm">
-                    <Upload action="//jsonplaceholder.typicode.com/posts/"  :default-file-list="defaultList" :on-success="fn">
-                        
+                    <Upload action="http://192.168.0.90:8011/dh-annex-table/file"  :default-file-list="defaultList" :on-success="fn">
                         <span v-show="flase"><Button  type="info" icon="ios-cloud-upload-outline"
                             >上传附件</Button
                         >
@@ -71,10 +69,7 @@ export default {
                 },
             ],
             data1: [
-                {
-                    name: "",
-                    tile: "会议内容已经完成，详见附件",
-                },
+               
             ],
             cityList: [
                 {
@@ -117,7 +112,12 @@ export default {
         //拿到上个页面传过来的索引
         let arr = JSON.parse(sessionStorage.getItem("data"));
         let ojb = arr[this.$route.query.text];
-        this.models = ojb.wczt;
+        // this.models = ojb.wczt;
+        let obj={
+            name:ojb.completionStatus,
+            tile:ojb.completionStatus? ojb.completionStatus:"无", 
+        }
+        this.data1.push(obj)
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后

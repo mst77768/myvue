@@ -14,7 +14,7 @@
 html,
 body {
     .size;
-     overflow: hidden;
+    overflow: hidden;
     margin: 0;
     padding: 0;
    

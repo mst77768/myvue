@@ -36,6 +36,7 @@
                         v-model="form.reportName"
                         placeholder="请输入..."
                         style="width: 4.54rem"
+                        @on-change="text"
                     />
                 </div>
             </div>
@@ -129,7 +130,11 @@ export default {
         },
         getdate(date) {
             this.form.meetingDate = date;
+            sessionStorage.setItem("wenjiantype",JSON.stringify(this.form))
         },
+        text(){
+           sessionStorage.setItem("wenjiantype",JSON.stringify(this.form))
+        }
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
@@ -137,6 +142,7 @@ export default {
         if(sessionStorage.getItem("perform")){
             this.form=JSON.parse(sessionStorage.getItem("perform"))
         }
+        sessionStorage.setItem("wenjiantype",JSON.stringify(this.form))
     },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）

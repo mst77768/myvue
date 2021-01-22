@@ -33,6 +33,9 @@ const routes = [{
     }, {
       path: "rlzz", //热力追踪页面
       component: () => import("../views/work/rlzz")
+    },{
+      path:"database",//数据采集页面
+      component:()=>import("../views/databasepage/database")
     }]
   },
   {
@@ -50,12 +53,12 @@ const routes = [{
   }, {
     path: "/fankui", //管理员查看附件的反馈页面路由
     component: () => import("../views/oneself-Page/wenjian2")
-  },{
-    path:"/readhuiyi",//动态路由的查看会议的页面路由
-    component:()=>import("../views/oneself-Page/readhuiyi")
-  },{
-    path:"/readyuedu",//查看月度会议的页面路由
-    component:()=>import("../views/oneself-Page/readyuedu.vue")
+  }, {
+    path: "/readhuiyi", //动态路由的查看会议的页面路由
+    component: () => import("../views/oneself-Page/readhuiyi")
+  }, {
+    path: "/readyuedu", //查看月度会议的页面路由
+    component: () => import("../views/oneself-Page/readyuedu.vue")
   }
 
 ];

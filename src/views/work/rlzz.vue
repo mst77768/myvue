@@ -54,7 +54,8 @@
                             v-model="form.coordinationDepartment"
                             clearable
                             style="width: 4.54rem"
-                            @on-change="xietiaofn">
+                            @on-change="xietiaofn"
+                        >
                             <Option
                                 v-for="item in xietiao"
                                 :value="item.value"
@@ -213,16 +214,18 @@ export default {
             page: 1,
             index: 0,
             zheren: [],
-            xietiao:[],
+            xietiao: [],
             form: {
                 source: "", //来源
-                release_time: "",
+                releaseTime: "",
                 prescription_type: "",
                 completion_status: "",
                 executive_department: "",
                 leading_cadre: "",
                 coordination_department: "",
                 coordinator: "",
+                pageNum: 1,
+                pageSize: 6,
             },
             type: [
                 {
@@ -234,26 +237,31 @@ export default {
                     label: "时效",
                 },
             ],
-            zhuantai:[
-               {
-                   value:"未提交",
-                   label:"未提交"
-               },{
-                   value:"已提交",
-                   label:"已提交",
-               },{
-                value:"进行中",
-                label:"进行中",
-               },{
-                   value:"完成",
-                   label:"完成",
-               },{
-                   value:"遵照执行",
-                   label:"遵照执行",
-               },{
-                   value:"延期",
-                   label:"延期",
-               }
+            zhuantai: [
+                {
+                    value: "未提交",
+                    label: "未提交",
+                },
+                {
+                    value: "已提交",
+                    label: "已提交",
+                },
+                {
+                    value: "进行中",
+                    label: "进行中",
+                },
+                {
+                    value: "完成",
+                    label: "完成",
+                },
+                {
+                    value: "遵照执行",
+                    label: "遵照执行",
+                },
+                {
+                    value: "延期",
+                    label: "延期",
+                },
             ],
             cityList: [
                 {
@@ -385,11 +393,15 @@ export default {
             console.log(data.data.username);
             this.form.leading_cadre = data.data.username;
         },
-        async xietiaofn(){
-            let data=await ajax("http://192.168.0.91:8080/sys-dept/findDepartmentHead",{
-                id:this.form.coordinationDepartment
-            },"get");
-            this.form.coordinator=data.data.username;
+        async xietiaofn() {
+            let data = await ajax(
+                "http://192.168.0.91:8080/sys-dept/findDepartmentHead",
+                {
+                    id: this.form.coordinationDepartment,
+                },
+                "get"
+            );
+            this.form.coordinator = data.data.username;
         },
         fn(data) {
             //获取时间的方法
@@ -420,12 +432,15 @@ export default {
             );
             this.count = parseInt(res.data.pageInfo.total);
             let arr = res.data.pageInfo.list;
-            arr.forEach((item, index) => {//给数组对象的加个新字段
+            arr.forEach((item, index) => {
+                //给数组对象的加个新字段
                 item["id"] = index + 1;
             });
             this.data1 = arr; //获取数据
             if (sessionStorage.getItem("bumen")) {
-                this.xietiao=this.zheren = JSON.parse(sessionStorage.getItem("bumen"));
+                this.xietiao = this.zheren = JSON.parse(
+                    sessionStorage.getItem("bumen")
+                );
             } else {
                 let bumen = await ajax(
                     "http://192.168.0.91:8080/sys-dept/searchDepartmentName",
@@ -438,7 +453,7 @@ export default {
                     "bumen",
                     JSON.stringify(bumen.data.names)
                 );
-                this.xietiao=this.zheren = bumen.data.names;
+                this.xietiao = this.zheren = bumen.data.names;
             }
         },
         goye(e) {
@@ -452,11 +467,36 @@ export default {
         start(date) {
             //获取日期的方法
             console.log(date);
-            this.form.release_time = date;
+            this.form.releaseTime = date;
         },
-       async seach(){//检索的方法
-          console.log(this.form)
-        }
+        async seach() {
+            //检索的方法
+
+            let obj = JSON.parse(JSON.stringify(this.form));
+
+            this.xietiao.forEach((item) => {
+                if (item.value == obj.coordinationDepartment) {
+                    obj.coordinationDepartment = item.label;
+                } else if (item.value == obj.executiveDepartment) {
+                    obj.executiveDepartment = item.label;
+                }
+            });
+            console.log(obj);
+            let res = await ajax(
+                "http://192.168.0.91:8080/dh-executive-tracking/searchExecutiveTracking",
+                obj,
+                "post"
+            );
+            console.log(res);
+            console.log(res.data.pageInfo.list)
+            this.count = parseInt(res.data.pageInfo.total);
+            let arr = res.data.pageInfo.list;
+            arr.forEach((item, index) => {
+                //给数组对象的加个新字段
+                item["id"] = index + 1;
+            });
+            this.data1 = arr; //获取数据
+        },
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
@@ -465,15 +505,17 @@ export default {
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
         this.hig = window.innerHeight / 2;
-        if (!sessionStorage.getItem("data")) {
-            sessionStorage.setItem("data", JSON.stringify(this.data1));
-        }
+
         this.getdata();
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后
     beforeDestroy() {}, //生命周期 - 销毁之前
-    destroyed() {}, //生命周期 - 销毁完成
+    destroyed() {
+        if (!sessionStorage.getItem("data")) {
+            sessionStorage.setItem("data", JSON.stringify(this.data1));
+        }
+    }, //生命周期 - 销毁完成
     activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
 };
 </script>

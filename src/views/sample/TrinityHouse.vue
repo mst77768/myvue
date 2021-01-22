@@ -13,6 +13,7 @@
                         <Select
                             v-model="form.dhVoybebVoyage.vesselNo"
                             style="width: 4.2rem"
+                            clearable
                         >
                             <Option
                                 v-for="item in cm"
@@ -27,6 +28,7 @@
                         <Select
                             v-model="form.dhVoybebVoyage.route"
                             style="width: 4.2rem"
+                            clearable
                         >
                             <Option
                                 v-for="item in hx"
@@ -38,15 +40,19 @@
                     </div>
                     <div>
                         <span>海务主管：</span>
-                        
+
                         <Select
-                v-model="form.dhVoybebVoyage.maritimeOfficer"
-                style="width: 4.2rem"
-                filterable
-                :remote-method="remoteMethod1"
-                :loading="loading1">
-                <Option v-for="(option, index) in zg" :value="option.value" :key="index">{{option.label}}</Option>
-            </Select>
+                            v-model="form.dhVoybebVoyage.maritimeOfficer"
+                            style="width: 4.2rem"
+                            clearable
+                        >
+                            <Option
+                                v-for="item in zg"
+                                :value="item.value"
+                                :key="item.value"
+                                >{{ item.label }}</Option
+                            >
+                        </Select>
                     </div>
                     <div class="yue">
                         <span>月份范围：</span>
@@ -132,9 +138,9 @@ export default {
                 limit: 10,
                 page: 1,
             },
-            cm:[],
-            hx:[],
-            zg:[],
+            cm: [],
+            hx: [],
+            zg: [],
             cityList: [
                 {
                     value: "New York",
@@ -161,7 +167,7 @@ export default {
                     label: "Canberra",
                 },
             ],
-            loading1:"",
+            loading1: "",
             columns2: [
                 {
                     title: "月份",
@@ -177,7 +183,7 @@ export default {
                     title: "航次号",
                     slot: "voyageNo",
                     width: 100,
-                    // slot: "voyageNo",
+                    
                 },
                 {
                     title: "预算TC",
@@ -185,7 +191,7 @@ export default {
                     width: 100,
                 },
                 {
-                    title: "业务主管",
+                    title: "海务主管",
                     key: "salesManager",
                     width: 100,
                 },
@@ -309,13 +315,13 @@ export default {
     watch: {},
     //方法集合
     methods: {
-        math(arr,newarr){
-            arr.forEach(item => {
-                let obj={
-                    label:item,
-                    value:item,
-                }
-                newarr.push(obj)
+        math(arr, newarr) {
+            arr.forEach((item) => {
+                let obj = {
+                    label: item,
+                    value: item,
+                };
+                newarr.push(obj);
             });
         },
         start(date) {
@@ -325,14 +331,13 @@ export default {
         end(date) {
             //获取结束的时间
             // this.form.endTime = date;
-            this.form.endTime=date
+            this.form.endTime = date;
             // console.log(this.form);
-            
         },
         goupdate(row) {
             //用于路由跳转页面
             console.log(row);
-            sessionStorage.setItem("haiwu",JSON.stringify(row))
+            sessionStorage.setItem("haiwu", JSON.stringify(row));
             this.$router.push("TrinHousePage");
         },
         updta() {
@@ -376,35 +381,38 @@ export default {
             console.log(arr);
             this.data3 = arr; //将请求的数据赋值给data3变量
         },
-        async getda(){
-           let res=await ajax("/common/getSelectDhVoybebHwsr",{},"get");
-           console.log(res.data)
-          
-           this.zg=res.data.maritimeOfficerList;
-           console.log(res.data.routeList)
-           this.math(res.data.routeList,this.hx)
-           console.log(res.data.vesselNoList)
-           this.math(res.data.vesselNoList,this.cm)
+        async getda() {
+            let res = await ajax("/common/getSelectDhVoybebHwsr", {}, "get");
+            console.log(res.data);
+
+            //    this.zg=res.data.maritimeOfficerList;
+            this.math(res.data.maritimeOfficerList, this.zg);
+            console.log(res.data.routeList);
+            this.math(res.data.routeList, this.hx);
+            console.log(res.data.vesselNoList);
+            this.math(res.data.vesselNoList, this.cm);
         },
-        remoteMethod1 (query) {
-                if (query !== '') {
-                    this.loading1 = true;
-                    setTimeout(() => {
-                        this.loading1 = false;
-                        const list = this.zg.map(item => {
-                            return {
-                                value: item,
-                                label: item
-                            };
-                        });
-                        this.zg = list.filter(item => item.label.indexOf(query) > -1);
-                    }, 200);
-                } else {
-                    this.zg = [];
-                }
-            },
+        remoteMethod1(query) {
+            if (query !== "") {
+                this.loading1 = true;
+                setTimeout(() => {
+                    this.loading1 = false;
+                    const list = this.zg.map((item) => {
+                        return {
+                            value: item,
+                            label: item,
+                        };
+                    });
+                    this.zg = list.filter(
+                        (item) => item.label.indexOf(query) != -1
+                    );
+                }, 100);
+            } else {
+                this.zg = [];
+            }
+        },
         seach() {
-            console.log(this.form)
+            console.log(this.form);
             this.getdata(this.form);
         },
     },
@@ -418,9 +426,8 @@ export default {
     mounted() {
         this.hig = (window.innerHeight / 3) * 2;
         console.log(new Date());
-       
-        this.getda()
-        
+
+        this.getda();
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后

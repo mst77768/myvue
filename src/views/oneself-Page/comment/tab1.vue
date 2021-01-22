@@ -72,8 +72,17 @@
                 :autosize="{ minRows: 5, maxRows: 9 }"
             />
             <div class="updata">
-                <Upload multiple action="//jsonplaceholder.typicode.com/posts/">
-                    <Button icon="ios-cloud-upload-outline">上传附件</Button>
+                <Upload
+                    multiple
+                    action="http://192.168.0.90:8011/dh-annex-table/file"
+                    :on-remove="remove"
+                    :before-upload="bginupdata"
+                    :data="da"
+                    :on-success="sucessupdata"
+                >
+                    <Button icon="ios-cloud-upload-outline" @click="btn"
+                        >上传附件</Button
+                    >
                 </Upload>
             </div>
         </div>
@@ -96,7 +105,12 @@ export default {
     data() {
         //这里存放数据
         return {
+            filelist: [],
             flag: true,
+            da: {
+                meetingDate: "",
+                reportName: "",
+            },
             columns1: [
                 {
                     title: "部门名称",
@@ -162,32 +176,92 @@ export default {
             localStorage.setItem("tab1", JSON.stringify(arr));
             this.$emit("fn", this.form); //子传父亲
         },
-        goperon(){
-          sessionStorage.setItem("meet",JSON.stringify(this.form.meetingPlace))
-          this.$router.push('/person');
-        }
+        goperon() {
+            sessionStorage.setItem(
+                "meet",
+                JSON.stringify(this.form.meetingPlace)
+            );
+            this.$router.push("/person");
+        },
+        btn() {
+            let obj = JSON.parse(sessionStorage.getItem("wenjiantype")); //拿到父亲里面的值
+            this.da.meetingDate = obj.meetingDate;
+            this.da.reportName = obj.reportName;
+            if (!this.da.meetingDate) {
+                this.$Notice.warning({
+                    title: "系统提醒！",
+                    desc: "会议日期未选择",
+                });
+            } else if (!this.da.reportName) {
+                this.$Notice.warning({
+                    title: "系统提醒！",
+                    desc: "报告名称未选择！",
+                });
+            }
+        },
+        async remove(file, arr) {
+            //删除文件
+            console.log(arr);
+            let res = await ajax(
+                "http://192.168.0.90:8011/dh-annex-table/deleteFile",
+                {
+                    id: file.response.data.dhAnnexTable.id,
+                },
+                "get"
+            );
+            console.log(res.msg);
+            this.$Notice.success({
+                title: "系统提醒！",
+                desc: res.msg,
+            });
+        },
+        bginupdata(file) {//上传文件之前的钩子函数
+            console.log(file);
+            let flag=true;
+            this.filelist.forEach((item) => {
+                if (item.name == file.name) {
+                    flag=false;
+                    this.$Notice.info({
+                        title: "系统提醒！",
+                        desc: "上传文件重复！请重新上传文件！",
+                    });  
+                }
+            });
+            if(!flag){
+               return false
+            }
+            
+        },
+        sucessupdata(req, file, filelist) {//上传文件成功的钩子函数
+            console.log(req);
+            console.log(file);
+            console.log(filelist);
+            this.filelist = filelist;
+        },
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
-        ajax("http://192.168.0.90:8011/sys-dept/SysDept", "get").then((data) => {
-            console.log(data.data.sysDept);
-            this.data1 = data.data.sysDept.slice(0,-1);//把数组截取
-        });
+        ajax("http://192.168.0.90:8011/sys-dept/SysDept", "get").then(
+            (data) => {
+                console.log(data.data.sysDept);
+                this.data1 = data.data.sysDept.slice(0, -1); //把数组截取
+            }
+        );
     },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
         var str = sessionStorage.getItem("proson") || "[]";
         // this.form.meetingPlace = sessionStorage.getItem("meetingPlace") || "";
-        console.log(this.form.meetingPlace)
-        var obj = JSON.parse(str);//选择参会人员
+        console.log(this.form.meetingPlace);
+        var obj = JSON.parse(str); //选择参会人员
         if (!(obj instanceof Array)) {
             this.form.participation = obj.a.toString();
             this.form.absent = obj.b.toString();
         }
-        if(sessionStorage.getItem("meet")){
-            this.form.meetingPlace=JSON.parse(sessionStorage.getItem("meet"))
+        if (sessionStorage.getItem("meet")) {
+            this.form.meetingPlace = JSON.parse(sessionStorage.getItem("meet"));
         }
     },
     beforeUpdate() {}, //生命周期 - 更新之前

@@ -65,7 +65,13 @@
                 </div>
             </div>
             <div class="volooktabbox">
-                <Table :columns="columns1" border :data="data1" max-height="400"> </Table>
+                <Table
+                    :columns="columns1"
+                    border
+                    :data="data1"
+                    max-height="400"
+                >
+                </Table>
             </div>
         </div>
     </div>
@@ -98,7 +104,7 @@ export default {
                 {
                     title: "航线",
                     key: "route",
-                    tooltip:true
+                    tooltip: true,
                 },
                 {
                     title: "币别",
@@ -107,32 +113,32 @@ export default {
                 {
                     title: "理想TC",
                     key: "idealTc",
-                    tooltip:true
+                    tooltip: true,
                 },
                 {
                     title: "实际TC",
                     key: "actualTc",
-                    tooltip:true
+                    tooltip: true,
                 },
                 {
                     title: "速度影响-转速",
                     key: "rotationalSpeedOffhire",
-                    width:"130"
+                    width: "130",
                 },
                 {
                     title: "速度影响-天气",
                     key: "weatherOffhire",
-                    width:"130"
+                    width: "130",
                 },
                 {
                     title: "卸货速度",
                     key: "dischargeCargoSpeedOffhire",
-                    width:"110"
+                    width: "110",
                 },
                 {
                     title: "在港时间",
                     key: "atportDateOffhire",
-                     width:"100"
+                    width: "100",
                 },
                 {
                     title: "吃水",
@@ -153,7 +159,7 @@ export default {
                 {
                     title: "间接offhire",
                     key: "indirectOffhireOffhire",
-                    width:"110"
+                    width: "110",
                 },
             ],
             data1: [],
@@ -287,32 +293,30 @@ export default {
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
-    created() {
-        
-        
-        
-    },
+    created() {},
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
-       
-        let obj=JSON.parse(localStorage.getItem("id"))
-        console.log(obj.vesselNo)
-        console.log(obj.voyageNo)
-        this.zdata=["",obj.idealTc,obj.actualTc]
-        
-         this.zhu();
-        ajax("/tcSummary/getTCSummaryDetail",{
-           vesselNo:obj.vesselNo,
-           voyageNo:obj.voyageNo
-        },"post").then(data=>{ 
-           let arr=data.data.bzt;
-           this.data1.push(Object.assign(data.data.contributionSummary,obj))
-           this.ydata=arr
-           console.log(data)
-            this.yuan();
-        })
+        let obj = JSON.parse(localStorage.getItem("id"));
+        console.log(obj.vesselNo);
+        console.log(obj.voyageNo);
+        this.zdata = ["", obj.idealTc, obj.actualTc];
 
+        this.zhu();
+        ajax(
+            "/tcSummary/getTCSummaryDetail",
+            {
+                vesselNo: obj.vesselNo,
+                voyageNo: obj.voyageNo,
+            },
+            "post"
+        ).then((data) => {
+            let arr = data.data.bzt;
+            this.data1.push(Object.assign(data.data.contributionSummary, obj));
+            this.ydata = arr;
+            console.log(data);
+            this.yuan();
+        });
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后
