@@ -23,9 +23,13 @@
                 <tab7 v-show="index == 6" />
             </div>
             <div class="updatab" v-if="index==0">
-                <Upload multiple action="//jsonplaceholder.typicode.com/posts/">
+                <!-- <Upload multiple action="//jsonplaceholder.typicode.com/posts/">
                     <Button icon="ios-cloud-upload-outline">上传附件</Button>
-                </Upload>
+                </Upload> -->
+                <h3>附件如下:</h3>
+                <p v-for="(item,index) in urlarr" :key="index">
+                    <a :href="item.fileUrl" :download="item.attachmentsName">{{item.attachmentsName}}</a>
+                </p>
             </div>
             <div class="bomt">
                 <Button
@@ -43,6 +47,7 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
+import ajax from "@/api/ajax.js"
 import tab1 from "./tab/Ytab";
 import tab2 from "./tab/tab2";
 import tab3 from "./tab/tab3";
@@ -66,6 +71,7 @@ export default {
         //这里存放数据
         return {
             index: 0,
+            urlarr:[]
         };
     },
     props:["arr","arr2"],
@@ -78,10 +84,21 @@ export default {
         fn(index) {
             this.index = index;
         },
+        async getfileurl(obj){
+            let res=await ajax(`http://192.168.0.91:8080/dh-mreport/monthlyMeetingAttachmentEcho/${obj.meetingDate}/${obj.reportName}`);
+            console.log(res.data.attachments)
+            this.urlarr=res.data.attachments;//附件
+            if(this.urlarr.length==0){
+                this.index=1;
+            }    
+        }
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
-    created() {},
+    created() {
+        let obj=JSON.parse(sessionStorage.getItem("look"))
+        this.getfileurl(obj)
+    },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {},
@@ -126,6 +143,16 @@ export default {
         height: auto;
         padding-bottom: 20px;
         border: 1px solid #ccc;
+        .updatab{
+            h3{
+                margin-left: 10px;
+                margin-bottom: 10px;
+            }
+            p {
+               padding-left: 20px;
+               margin-bottom: 5px;     
+            }
+        }
     }
    
      .bomt {

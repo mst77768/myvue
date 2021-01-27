@@ -9,7 +9,7 @@ const routes = [{
     path: '/',
     name: 'Home',
     component: () => import('../views/index'),
-    redirect: "voyagetable", //重定向到这个航次分析页面
+    redirect: "/login", //重定向到这个航次分析页面
     children: [{
       path: "voyagetable",
       component: () => import("../views/sample/voyage")
@@ -36,7 +36,11 @@ const routes = [{
     },{
       path:"database",//数据采集页面
       component:()=>import("../views/databasepage/database")
+    },{
+      path:"iframe",//嵌入页面
+      component:()=>import("../views/databasepage/iframe")
     }]
+    // 下面都是一级路由
   },
   {
     path: "/addhuiyi", //执行力跟踪的添加单独页面路由
@@ -59,6 +63,9 @@ const routes = [{
   }, {
     path: "/readyuedu", //查看月度会议的页面路由
     component: () => import("../views/oneself-Page/readyuedu.vue")
+  },{
+    path:"/login",//登录页面的接口
+    component:()=>import("../views/login/login.vue")
   }
 
 ];

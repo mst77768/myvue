@@ -167,7 +167,7 @@
                         </Select>
                     </template>
                 </Table>
-                <p @click="add">+新增</p>
+               
             </div>
             <div class="btombotn">
                 <Button type="primary" size="large" @click="tijiao"
@@ -344,20 +344,20 @@ export default {
     watch: {},
     //方法集合
     methods: {
-        add() {
+        // add() {
             
-            // if (this.flag) {
-            //     obj.name = (this.data1.length + 1).toString();
-            //     obj.flag = true;
-            //     this.data1.push(obj);
-            //     this.flag = false;
-            // } else {
-            //     this.$Notice.info({
-            //         title: "系统提醒！",
-            //         desc: "你上条数据未操作完成！",
-            //     });
-            // }
-        },
+        //     // if (this.flag) {
+        //     //     obj.name = (this.data1.length + 1).toString();
+        //     //     obj.flag = true;
+        //     //     this.data1.push(obj);
+        //     //     this.flag = false;
+        //     // } else {
+        //     //     this.$Notice.info({
+        //     //         title: "系统提醒！",
+        //     //         desc: "你上条数据未操作完成！",
+        //     //     });
+        //     // }
+        // },
         fn(a) {//获取时间
             //这个方法是设置对应的索引的
             console.log(a);
@@ -404,7 +404,13 @@ export default {
                 arr.push(JSON.parse(JSON.stringify(obj)))
             });
             ajax("http://192.168.0.91:8080/dh-executive-tracking/saveExecutiveTrackingContent",arr,"post").then(res=>{
-                console.log(res.data)
+                console.log(res)
+                if(res.code===200){
+                    this.$Message.success("添加完成");
+                    this.$router.push("/rlzz");
+                }else{
+                    this.$Message.error(res.data.msg);
+                }
             })
             
         },
@@ -438,7 +444,11 @@ export default {
         async addw(){
             this.data1=[];
             let res2=await ajax("http://192.168.0.91:8080/dh-executive-tracking/saveExecutiveTrackingInstructions",this.form,"post");
-            console.log(res2);
+            console.log(res2.data.msg);
+            if(res2.code===201){
+                this.$Message.error(res2.data.msg);
+                return false
+            }
             let arr=[];
             arr=res2.data.instructionsVoList;
             console.log(arr)

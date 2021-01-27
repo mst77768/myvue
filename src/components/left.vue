@@ -31,6 +31,7 @@
                     设备管理
                 </template>
                 <MenuItem name="4-1" to="database">数据采集</MenuItem>
+                <MenuItem name="4-2" to="iframe">数据监控</MenuItem>
                 
             </Submenu>
         </Menu>

@@ -22,18 +22,19 @@
                 <tab6 v-show="index == 5" />
                 <tab7 v-show="index == 6" />
             </div>
-            <div class="updatab" v-if="index==0">
-                <Upload multiple action="//jsonplaceholder.typicode.com/posts/">
+            <div class="updatab" v-if="index == 0">
+                <Upload
+                    multiple
+                    action="http://192.168.0.91:8080/ossservice/oss/upload"
+                    :on-success="success"
+                    :before-upload="upload"
+                    :on-remove="removefile"
+                >
                     <Button icon="ios-cloud-upload-outline">上传附件</Button>
                 </Upload>
             </div>
             <div class="bomt">
-                <Button
-                    size="large"
-                    type="primary"
-                    @click="$router.push('huiyi')"
-                    >提交</Button
-                >
+                <Button size="large" type="primary" @click="add">提交</Button>
                 <Button
                     size="large"
                     type="success"
@@ -55,7 +56,7 @@ import tab4 from "./tab/tab4";
 import tab5 from "./tab/tab5";
 import tab6 from "./tab/tab6";
 import tab7 from "./tab/tab7";
-
+import ajax from "@/api/ajax.js";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {
@@ -80,6 +81,15 @@ export default {
                 "管理四项基本原则",
                 "绩效处罚",
             ],
+            fileurl: {
+                attachmentsName: "", //附件名称
+                department: "数据化研发部门",
+                fileUrl: "", //附件地址
+                meetingDate: "", //时间
+                personnel: "李兴波",
+                reportName: "", //报告名称
+            },
+            filearr: [],
         };
     },
     //监听属性 类似于data概念
@@ -91,6 +101,104 @@ export default {
         fn(index) {
             this.index = index;
         },
+        add() {
+            //提交操作
+            let obj = JSON.parse(sessionStorage.getItem("wenjiantype"));
+            let obj2 = JSON.parse(sessionStorage.getItem("enddata"));
+            obj["meetingPlace"] = "大会议室";
+            obj["reportType"] = "月度会议";
+            console.log(obj);
+            let form = {
+                ...obj,
+                ...obj2,
+                titleName: "月度总结",
+                reportContent: this.arr[this.arr.length - 1].value6,
+                reportTitle: this.arr[this.arr.length - 1].value16,
+            };
+            if (sessionStorage.getItem("arrlength") == 1) {
+                ajax(
+                    "http://192.168.0.91:8080/dh-meeting-title/saveMonthlyMeetingHeader",
+                    obj,
+                    "post"
+                ).then((res) => {
+                    console.log(res);
+                    ajax(
+                        "http://192.168.0.91:8080/dh-mreport/saveMonthlyMeetingContent",
+                        form,
+                        "post"
+                    ).then((res) => {
+                        console.log(res);
+                        ajax(
+                            "http://192.168.0.91:8080/dh-annex-table/uploadMeetingAttachment",
+                            this.filearr,
+                            "post"
+                        ).then((res) => {
+                            console.log(res);
+                        });
+                    });
+                });
+            } else {
+                ajax(
+                    "http://192.168.0.91:8080/dh-mreport/saveMonthlyMeetingSmallContent",
+                    form,
+                    "post"
+                ).then((res) => {
+                    console.log(res);
+                    ajax(
+                        "http://192.168.0.91:8080/dh-annex-table/uploadMeetingAttachment",
+                        this.filearr,
+                        "post"
+                    ).then((res) => {
+                        console.log(res);
+                    });
+                });
+            }
+        },
+        upload() {
+            let obj = JSON.parse(sessionStorage.getItem("wenjiantype"));
+
+            this.fileurl.meetingDate = obj.meetingDate;
+            this.fileurl.reportName = obj.reportName;
+        },
+        success(res, file, filearr) {
+            let arr = [];
+            for (let i = 0; i < filearr.length; i++) {
+                this.fileurl.fileUrl =
+                    filearr[i].response.data.uploadDto.fileUrl;
+                this.fileurl.attachmentsName =
+                    filearr[i].response.data.uploadDto.originalFilename;
+                arr.push(JSON.parse(JSON.stringify(this.fileurl)));
+            }
+            this.filearr = arr;
+            console.log(this.fileurl);
+
+            console.log(res);
+            console.log(file);
+            console.log(filearr);
+        },
+        removefile(file,filearr){
+            let arr = [];
+            for (let i = 0; i < filearr.length; i++) {
+                this.fileurl.fileUrl =
+                    filearr[i].response.data.uploadDto.fileUrl;
+                this.fileurl.attachmentsName =
+                    filearr[i].response.data.uploadDto.originalFilename;
+                arr.push(JSON.parse(JSON.stringify(this.fileurl)));
+            }
+            this.filearr = arr;
+            let obj={
+                originalFilename:file.name,
+                fileUrl:file.response.data.uploadDto.fileUrl
+            }
+            ajax("http://192.168.0.91:8080/ossservice/oss/delete",obj,"post").then(res=>{//删除功能
+                console.log(res.code)
+                if(res.code==200){ 
+                   this.$Message.success('文件删除成功！');
+                }
+            })
+            console.log(file);
+            console.log(filearr)
+        }
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
@@ -141,8 +249,8 @@ export default {
         padding-bottom: 20px;
         border: 1px solid #ccc;
     }
-   
-     .bomt {
+
+    .bomt {
         width: 23%;
         display: flex;
         margin: 15px auto;

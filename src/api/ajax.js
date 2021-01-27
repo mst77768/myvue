@@ -1,6 +1,8 @@
 import axios from "axios"
 //导入axios
-
+if(sessionStorage.getItem("token")){//请求头携带token
+    axios.defaults.headers.common["token"] = sessionStorage.getItem("token");  
+}
 // 配置请求的基准URL地址
 axios.defaults.baseURL = 'http://192.168.0.101:8100/voyagemanagement'
 // axios设置请求拦截器,设置响应头token

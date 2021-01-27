@@ -98,7 +98,7 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-import ajax from "@/api/ajax.js";
+import ajax from "@/api/ajax.js"
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
@@ -110,6 +110,7 @@ export default {
             da: {
                 meetingDate: "",
                 reportName: "",
+                token:"",
             },
             columns1: [
                 {
@@ -144,7 +145,9 @@ export default {
     //监听属性 类似于data概念
     computed: {},
     //监控data中的数据变化
-    watch: {},
+    watch: {
+        
+    },
     //方法集合
     methods: {
         add() {
@@ -187,6 +190,7 @@ export default {
             let obj = JSON.parse(sessionStorage.getItem("wenjiantype")); //拿到父亲里面的值
             this.da.meetingDate = obj.meetingDate;
             this.da.reportName = obj.reportName;
+            this.da=sessionStorage.getItem("token");
             if (!this.da.meetingDate) {
                 this.$Notice.warning({
                     title: "系统提醒！",

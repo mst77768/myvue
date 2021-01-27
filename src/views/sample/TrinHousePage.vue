@@ -330,6 +330,21 @@ export default {
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
         this.form = JSON.parse(sessionStorage.getItem("haiwu"));
+        console.log(this.form)
+        ajax("/common/getDhVoybebHwsrDetail",{},"get").then(res=>{
+            console.log(res.data)
+            let arr=[];
+            for(let i=0;i<res.data.length;i++){
+                let obj={
+                    label:res.data[i],
+                    value:res.data[i]
+                };
+                arr.push(obj)   
+            }
+            this.cityList=arr;
+            console.log(this.cityList)
+
+        })
     },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
@@ -439,18 +454,18 @@ export default {
                 .qita1 {
                     width: 30rem;
                     height: 2.7rem;
-                    margin-top: 0.9rem;
+                    margin-top: 0.6rem;
                     display: flex;
                     // background-color: red;
                     margin-left: 0.61rem;
                     .hhleft {
                         width: 25%;
-                        height: 100%;
+                        height: 90%;
                         float: left;
                     }
                     .right {
                         width: 70%;
-                        height: 100%;
+                        height: 90%;
                         float: right;
                         display: flex;
                         justify-content: space-between;

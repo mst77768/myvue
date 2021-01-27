@@ -241,9 +241,10 @@ export default {
         golook(row) {
             sessionStorage.setItem("look",JSON.stringify(row));
             if(row.reportType==="周例会"){
-this.$router.push("/readhuiyi")
+              this.$router.push("/readhuiyi")
             }else if(row.reportType==="月度会议"){
-                this.$router.push("/readyuedu");
+
+                this.$router.push(`/readyuedu`);
             }
             // this.$router.push(`/readhuiyi/${row.name}`);   
         },

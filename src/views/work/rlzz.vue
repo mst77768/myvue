@@ -117,10 +117,11 @@
             <div class="tablebox1">
                 <div class="top1">
                     <div class="topxin">
-                        <Button type="info" @click="goadd">新增</Button>
-                        <Button type="warning">编辑</Button>
+                        <Button type="warning" @click="goadd">新增</Button>
+                        <!-- <Button type="warning">编辑</Button> -->
                         <Button
                             type="primary"
+                            :disabled="flag"
                             @click="$router.push(`/fankui?text=${index}`)"
                             >进度反馈</Button
                         >
@@ -172,7 +173,7 @@
                                         font-width: 800;
                                         font-size: 16px;
                                     "
-                                    @click="goupdata(index)"
+                                    @click="goupdata(row)"
                                     >{{ row.attachmentsNumber }}</span
                                 >
                             </Poptip>
@@ -215,6 +216,7 @@ export default {
             index: 0,
             zheren: [],
             xietiao: [],
+            flag:true,
             form: {
                 source: "", //来源
                 releaseTime: "",
@@ -289,7 +291,7 @@ export default {
             columns1: [
                 {
                     title: "序号",
-                    key: "id",
+                    key: "name",
                     width: "80",
                     align: "center",
                 },
@@ -316,6 +318,7 @@ export default {
                     key: "releaseTime",
                     align: "center",
                     width: "140",
+                    tooltip:true
                 },
                 {
                     title: "汇报频率",
@@ -364,6 +367,7 @@ export default {
                     key: "informationNote",
                     align: "center",
                     width: "180",
+                    tooltip:true
                 },
                 {
                     title: "附件总数",
@@ -386,7 +390,7 @@ export default {
             let data = await ajax(
                 "http://192.168.0.91:8080/sys-dept/findDepartmentHead",
                 {
-                    id: this.form.executiveDepartment,
+                    name: this.form.executiveDepartment,
                 },
                 "get"
             );
@@ -397,7 +401,7 @@ export default {
             let data = await ajax(
                 "http://192.168.0.91:8080/sys-dept/findDepartmentHead",
                 {
-                    id: this.form.coordinationDepartment,
+                    name: this.form.coordinationDepartment,
                 },
                 "get"
             );
@@ -414,11 +418,13 @@ export default {
         goupdata(index) {
             //跳转到附件的页面
             console.log(index);
-            this.$router.push(`/wenjian?text=${index}`);
+             this.$router.push(`/wenjian?text=${index.id}`);
         },
         fn2(a, b) {
             this.index = b;
+            this.flag=false
             console.log(a);
+            sessionStorage.setItem("wenID",JSON.stringify(a.id));
         },
         async getdata(pageNum = 1, pageSize = 6) {
             //定义一个分页方法
@@ -430,11 +436,13 @@ export default {
                 },
                 "post"
             );
+            console.log(res)
             this.count = parseInt(res.data.pageInfo.total);
             let arr = res.data.pageInfo.list;
+            console.log(arr)
             arr.forEach((item, index) => {
                 //给数组对象的加个新字段
-                item["id"] = index + 1;
+                item["name"] = index + 1;
             });
             this.data1 = arr; //获取数据
             if (sessionStorage.getItem("bumen")) {

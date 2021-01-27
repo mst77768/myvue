@@ -25,6 +25,7 @@
                 </div>
             </div>
             <p class="ip" @click="add">+新增</p>
+            
         </div>
     </div>
 </template>
@@ -32,7 +33,7 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import ajax from "@/api/ajax.js";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
@@ -45,20 +46,49 @@ export default {
                     value6: "",
                 },
             ],
+            timer:"",
         };
     },
     //监听属性 类似于data概念
     computed: {},
     //监控data中的数据变化
-    watch: {},
+    watch: {   
+    },
     //方法集合
     methods: {
-        add() {
-            let obj = {
-                value16: "",
-                value6: "",
+        add() {//添加操作
+         let obj = JSON.parse(sessionStorage.getItem("wenjiantype"));
+                obj["meetingPlace"] = "大会议室";
+                obj["reportType"] = "月度会议";
+                console.log(obj);
+         let form={
+           ...obj,
+           titleName:"月度总结",
+           reportContent:this.arr[this.arr.length-1].value6,
+           reportTitle:this.arr[this.arr.length-1].value16
+         }       
+            if (this.arr.length == 1) {
+                ajax(
+                    "http://192.168.0.91:8080/dh-meeting-title/saveMonthlyMeetingHeader",
+                    obj,
+                    "post"
+                ).then((res) => {
+                    console.log(res);
+                    ajax("http://192.168.0.91:8080/dh-mreport/saveMonthlyMeetingContent",form,"post").then(res=>{
+                        console.log(res)
+                    })
+                });
+            }else{
+                ajax("http://192.168.0.91:8080/dh-mreport/saveMonthlyMeetingSmallContent",form,"post").then(res=>{
+                    console.log(res);
+                })
+            }
+            let obj1 = {
+                value16: "",//标题
+                value6: "",//内容
             };
-            this.arr.push(obj);
+            this.arr.push(obj1);
+            
         },
     },
     beforeCreate() {}, //生命周期 - 创建之前
@@ -66,11 +96,20 @@ export default {
     created() {},
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
-    mounted() {},
+    mounted() {
+        this.timer=setInterval(()=>{
+            sessionStorage.setItem("enddata",JSON.stringify(this.arr[this.arr.length-1]));
+            sessionStorage.setItem("arrlength",JSON.stringify(this.arr.length));
+        },500)
+    },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后
-    beforeDestroy() {}, //生命周期 - 销毁之前
-    destroyed() {}, //生命周期 - 销毁完成
+    beforeDestroy() {
+        clearInterval(this.timer);//清除定时器
+    }, //生命周期 - 销毁之前
+    destroyed() {
+        
+    }, //生命周期 - 销毁完成
     activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
 };
 </script>
@@ -80,7 +119,7 @@ export default {
     // min-height: 700px;
     padding-bottom: 30px;
     height: auto;
-    
+
     .main {
         width: 100%;
         height: auto;

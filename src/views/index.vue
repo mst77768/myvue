@@ -1,8 +1,8 @@
 <!-- 页面主入口 -->
 <template>
     <div class="home">
-        <header>
-            <img src="../assets/img/u109.png" alt="" />
+        <header @click="logout">
+            <img src="../assets/img/u109.png" alt=""  />
         </header>
         <!-- 头部就是一个图片 -->
         <main>
@@ -25,11 +25,26 @@
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 import left from "@/components/left";
+import ajax from "@/api/ajax.js"
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {
         left,
     },
+    methods:{
+        logout(){
+           ajax("http://192.168.0.90:9090/Auth/logout",{},"post").then(res=>{
+               console.log(res.data)
+               if(res.code==401){
+                   this.$Message.warning('退出成功！重新登录');
+                    localStorage.clear();
+               this.$router.push("/login");
+               }
+               
+
+           })
+        }
+    }
 };
 </script>
 <style lang="less" >
