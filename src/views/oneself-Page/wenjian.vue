@@ -116,7 +116,7 @@ export default {
         // let ojb = arr[];
         // console.log(ojb.id)
         ajax(
-            `http://192.168.0.91:8080/dh-executive-tracking/progressFeedbackEcho/${this.$route.query.text}`,
+            `http://192.168.0.91:8011/dh-executive-tracking/progressFeedbackEcho/${this.$route.query.text}`,
             {},
             "get"
         ).then((res) => {

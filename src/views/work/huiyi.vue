@@ -248,7 +248,7 @@ export default {
         },
         getsearch() {
             ajax(
-                "http://192.168.0.91:8080/dh-meeting-title/searchConferesnceReport",
+                "http://192.168.0.91:8011/dh-meeting-title/searchConferesnceReport",
                this.search,
                 "post"
             ).then((data) => {

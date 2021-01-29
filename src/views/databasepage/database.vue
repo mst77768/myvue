@@ -9,7 +9,7 @@
                     @on-row-dblclick="dbfn"
                     highlight-row
                     :data="data10"
-                    no-data-text="去找后端他没给我返回数据！"
+                    no-data-text="数据为空！"
                     border
                     :height="hig"
                 >
@@ -20,87 +20,6 @@
                 <p v-show="quanflag" id="add" @click="add">添加</p>
             </div>
         </div>
-        <!-- <Modal
-            :draggable="true"
-            v-model="flag"
-            fullscreen
-            title="数据采集表单填写"
-            @on-ok="ok"
-            @on-cancel="cancel"
-        >
-            <div style="height: 120px; display: flex; overflow-x: scroll">
-                <div style="white-space: nowrap; margin-right: 20px">
-                    <Select
-                        v-model="form.shipId"
-                        prefix="md-boat"
-                        placeholder="请选择船名"
-                        style="width: 200px"
-                    >
-                        <Option
-                            v-for="item in cityList"
-                            :value="item.value"
-                            :key="item.value"
-                            >{{ item.label }}</Option
-                        >
-                    </Select>
-                </div>
-                <div style="white-space: nowrap; margin-right: 20px">
-                    <span>日期</span>:
-                    <DatePicker
-                        type="date"
-                        :value="form.recordriqi"
-                        @on-change="getdate"
-                        placeholder="年/月/日"
-                        style="width: 140px"
-                    ></DatePicker>
-                </div>
-                <div style="white-space: nowrap; margin-right: 30px">
-                    <span>时间</span>:
-                    <TimePicker
-                        type="time"
-                        :value="form.recordshijian"
-                        @on-change="gettime"
-                        placeholder="时/分/秒"
-                        style="width: 140px"
-                    ></TimePicker>
-                </div>
-                <div
-                    v-for="(item, index) of titlearr"
-                    :key="index"
-                    style="white-space: nowrap; margin-right: 30px"
-                >
-                    <span>{{ item.title }}</span
-                    >:
-                    <Input
-                        v-model="item.models"
-                        type="number"
-                        :placeholder="item.title"
-                        clearable
-                        style="width: 140px"
-                    />
-                </div>
-                <div style="white-space: nowrap; margin-right: 30px">
-                    <span>轴向振动量 mm</span>:
-                    <Input
-                        v-model="form.zhouxiangzhendongliang"
-                        type="number"
-                        placeholder="轴向振动量 mm"
-                        clearable
-                        style="width: 140px"
-                    />
-                </div>
-                <div style="white-space: nowrap; margin-right: 30px">
-                    <span>中间轴轴承温度℃</span>:
-                    <Input
-                        v-model="form.zhongjianzhouzhouchengwendu"
-                        type="number"
-                        placeholder="中间轴轴承温度℃"
-                        clearable
-                        style="width: 140px"
-                    />
-                </div>
-            </div>
-        </Modal> -->
         <Modal
             v-model="flag"
             fullscreen
@@ -109,11 +28,15 @@
             @on-ok="ok"
             @on-cancel="cancel"
         >
+        <p slot="footer" style="color:#f60;text-align:center">
+             <Button type="primary" size="large" @click="ok">{{msg}}</Button>
+             <Button type="error" size="large" @click="cancel">取消</Button>
+        </p>
             <div
                 class="contron"
                 style="
-                    width: 90%;
-                    height: 220%;
+                    width: 98%;
+                    height: 250%;
                     margin: 10px auto;
                     display: flex;
                     flex-wrap: wrap;
@@ -849,6 +772,8 @@ export default {
     //方法集合
     methods: {
         ok() {
+            
+            this.flag=true
             //点击提交按钮
             let obj = {};
 
@@ -873,6 +798,7 @@ export default {
                     form
                 )
                 .then((res) => {
+                    this.flag=false;
                     //添加接口调用
                     console.log(res.status);
                     if (res.status === 200) {
@@ -887,6 +813,8 @@ export default {
         cancel() {
             //点击取消按钮
             console.log(1111);
+            this.flag=false
+           
         },
         getdate(date) {
             //获取日期
@@ -968,7 +896,7 @@ export default {
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
         axios.defaults.headers.common["token"] =
-            "6364dec7ba6568f325d918fac1bc6d22";
+            "95edb01fbf2739891f559c8e101feab3";
         axios
             .get("http://192.168.0.101:8067/equipment/sysMenu/getMenu/0502")
             .then((res) => {
@@ -1018,10 +946,6 @@ export default {
     height: 99%;
     margin: 4px auto;
     font-size: 14px;
-    .ivu-modal-fullscreen .ivu-modal-footer{
-        text-align: center !important;
-    }
-
     .databox {
         width: 100%;
         height: 99%;
@@ -1045,17 +969,10 @@ export default {
                 font-weight: 800;
                 transition: all 0.3s;
                 border-color: blue;
-                color: blue; 
-                
-            }
-     
-        }
-         
-       
-    }
-    
-   
-    
+                color: blue;                 
+            }     
+        }      
+    }    
 }
 
 </style>

@@ -25,7 +25,7 @@
             <div class="updatab" v-if="index == 0">
                 <Upload
                     multiple
-                    action="http://192.168.0.91:8080/ossservice/oss/upload"
+                    action="http://192.168.0.91:8011/ossservice/oss/upload"
                     :on-success="success"
                     :before-upload="upload"
                     :on-remove="removefile"
@@ -118,19 +118,19 @@ export default {
             };
             if (sessionStorage.getItem("arrlength") == 1) {
                 ajax(
-                    "http://192.168.0.91:8080/dh-meeting-title/saveMonthlyMeetingHeader",
+                    "http://192.168.0.91:8011/dh-meeting-title/saveMonthlyMeetingHeader",
                     obj,
                     "post"
                 ).then((res) => {
                     console.log(res);
                     ajax(
-                        "http://192.168.0.91:8080/dh-mreport/saveMonthlyMeetingContent",
+                        "http://192.168.0.91:8011/dh-mreport/saveMonthlyMeetingContent",
                         form,
                         "post"
                     ).then((res) => {
                         console.log(res);
                         ajax(
-                            "http://192.168.0.91:8080/dh-annex-table/uploadMeetingAttachment",
+                            "http://192.168.0.91:8011/dh-annex-table/uploadMeetingAttachment",
                             this.filearr,
                             "post"
                         ).then((res) => {
@@ -140,13 +140,13 @@ export default {
                 });
             } else {
                 ajax(
-                    "http://192.168.0.91:8080/dh-mreport/saveMonthlyMeetingSmallContent",
+                    "http://192.168.0.91:8011/dh-mreport/saveMonthlyMeetingSmallContent",
                     form,
                     "post"
                 ).then((res) => {
                     console.log(res);
                     ajax(
-                        "http://192.168.0.91:8080/dh-annex-table/uploadMeetingAttachment",
+                        "http://192.168.0.91:8011/dh-annex-table/uploadMeetingAttachment",
                         this.filearr,
                         "post"
                     ).then((res) => {
@@ -194,7 +194,7 @@ export default {
                 originalFilename:file.name,
                 fileUrl:file.response.data.uploadDto.fileUrl
             }
-            ajax("http://192.168.0.91:8080/ossservice/oss/delete",obj,"post").then(res=>{//删除功能
+            ajax("http://192.168.0.91:8011/ossservice/oss/delete",obj,"post").then(res=>{//删除功能
                 console.log(res.code)
                 if(res.code==200){ 
                    this.$Message.success('文件删除成功！');

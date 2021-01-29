@@ -69,17 +69,17 @@ export default {
          }       
             if (this.arr.length == 1) {
                 ajax(
-                    "http://192.168.0.91:8080/dh-meeting-title/saveMonthlyMeetingHeader",
+                    "http://192.168.0.91:8011/dh-meeting-title/saveMonthlyMeetingHeader",
                     obj,
                     "post"
                 ).then((res) => {
                     console.log(res);
-                    ajax("http://192.168.0.91:8080/dh-mreport/saveMonthlyMeetingContent",form,"post").then(res=>{
+                    ajax("http://192.168.0.91:8011/dh-mreport/saveMonthlyMeetingContent",form,"post").then(res=>{
                         console.log(res)
                     })
                 });
             }else{
-                ajax("http://192.168.0.91:8080/dh-mreport/saveMonthlyMeetingSmallContent",form,"post").then(res=>{
+                ajax("http://192.168.0.91:8011/dh-mreport/saveMonthlyMeetingSmallContent",form,"post").then(res=>{
                     console.log(res);
                 })
             }

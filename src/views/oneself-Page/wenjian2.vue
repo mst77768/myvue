@@ -50,7 +50,7 @@
                 </Table>
                 <div class="botm">
                     <Upload
-                        action="http://192.168.0.91:8080/ossservice/oss/upload"
+                        action="http://192.168.0.91:8011/ossservice/oss/upload"
                         :on-remove="wjremove"
                         :on-progress="wjread"
                         :default-file-list="defaultList"
@@ -168,13 +168,10 @@ export default {
         },
         async nb() {
             this.flag = false;
-            // alert("提交成功马上回去")
-            // setTimeout(()=>{
-            //     this.$router.go(-1);
-            // },1000)
+           
             if (this.tab) {
                 let res = await ajax(
-                    "http://192.168.0.91:8080/dh-executive-tracking/saveProgressFeedback",
+                    "http://192.168.0.91:8011/dh-executive-tracking/saveProgressFeedback",
                     this.form,
                     "post"
                 );
@@ -185,7 +182,7 @@ export default {
                 }
             } else {
                 let res = await ajax(
-                    "http://192.168.0.91:8080/dh-annex-table/uploadFeedbackAttachment",
+                    "http://192.168.0.91:8011/dh-annex-table/uploadFeedbackAttachment",
                     this.arr,
                     "post"
                 );
@@ -193,8 +190,15 @@ export default {
             }
         },
         wjremove(file, filelist) {
-            console.log(file);
-            console.log(filelist);
+            console.log(file.name);
+            console.log(file.response.data.uploadDto.fileUrl)
+            ajax("http://192.168.0.91:8011/ossservice/oss/delete",{
+                 fileUrl:file.response.data.uploadDto.fileUrl,
+                 originalFilename:file.name
+            },"post").then(res=>{
+                console.log(res)
+            })
+             console.log(filelist);
         },
         wjread(a, b, c) {
             console.log(a);
@@ -210,11 +214,11 @@ export default {
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
         //拿到上个页面传过来的索引
-        let arr = JSON.parse(sessionStorage.getItem("data"));
-        console.log(arr);
-        let obj = arr[this.$route.query.text];
-        console.log(obj.id);
-        this.form.id =this.form2.detId= obj.id;
+        // let arr = JSON.parse(sessionStorage.getItem("data"));
+        // console.log(arr);
+        // let obj = arr[this.$route.query.text];
+        // console.log(obj.id);
+        // this.form.id =this.form2.detId= obj.id;
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后

@@ -403,7 +403,7 @@ export default {
                 };
                 arr.push(JSON.parse(JSON.stringify(obj)))
             });
-            ajax("http://192.168.0.91:8080/dh-executive-tracking/saveExecutiveTrackingContent",arr,"post").then(res=>{
+            ajax("http://192.168.0.91:8011/dh-executive-tracking/saveExecutiveTrackingContent",arr,"post").then(res=>{
                 console.log(res)
                 if(res.code===200){
                     this.$Message.success("添加完成");
@@ -425,7 +425,7 @@ export default {
             }, 1000);
         },
         liayuan(value){
-            ajax("http://192.168.0.91:8080/dh-executive-tracking/searchExecutiveTitle",{
+            ajax("http://192.168.0.91:8011/dh-executive-tracking/searchExecutiveTitle",{
                source:value
             },"post").then(res=>{
                this.form.reportName=res.data.reportName[0].value
@@ -433,7 +433,7 @@ export default {
             })
         },
         baogao(value){
-            ajax("http://192.168.0.91:8080/dh-executive-tracking/searchTrackingTitle",{
+            ajax("http://192.168.0.91:8011/dh-executive-tracking/searchTrackingTitle",{
                reportName:value 
             },"post").then(res=>{
                 this.form.meetingDate=res.data.meetingDate[0].value
@@ -443,7 +443,7 @@ export default {
         },
         async addw(){
             this.data1=[];
-            let res2=await ajax("http://192.168.0.91:8080/dh-executive-tracking/saveExecutiveTrackingInstructions",this.form,"post");
+            let res2=await ajax("http://192.168.0.91:8011/dh-executive-tracking/saveExecutiveTrackingInstructions",this.form,"post");
             console.log(res2.data.msg);
             if(res2.code===201){
                 this.$Message.error(res2.data.msg);
@@ -520,14 +520,14 @@ export default {
         },
        async select(value){
            console.log(value)
-           let res=await ajax("http://192.168.0.91:8080/sys-dept/findDepartmentHead",{
+           let res=await ajax("http://192.168.0.91:8011/sys-dept/findDepartmentHead",{
                name:value
            },"get");
            console.log(res.data.username)
            this.data1[this.index].b.selsemode1=res.data.username
         },
         async selectc(value){
-           let res=await ajax("http://192.168.0.91:8080/sys-dept/findDepartmentHead",{
+           let res=await ajax("http://192.168.0.91:8011/sys-dept/findDepartmentHead",{
                name:value
            },"get");
            console.log(res.data.username)
@@ -542,7 +542,7 @@ export default {
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
-        ajax("http://192.168.0.91:8080/dh-executive-tracking/searchExecutiveTitle",{
+        ajax("http://192.168.0.91:8011/dh-executive-tracking/searchExecutiveTitle",{
             source:this.form.source
         },"post").then(res=>{
             console.log(res.data.reportName)

@@ -397,7 +397,7 @@ export default {
         async bumen() {
             //请求回来的部门数据
             let data = await ajax(
-                "http://192.168.0.91:8080/sys-dept/findDepartmentHead",
+                "http://192.168.0.91:8011/sys-dept/findDepartmentHead",
                 {
                     name: this.form.executiveDepartment,
                 },
@@ -408,7 +408,7 @@ export default {
         },
         async xietiaofn() {
             let data = await ajax(
-                "http://192.168.0.91:8080/sys-dept/findDepartmentHead",
+                "http://192.168.0.91:8011/sys-dept/findDepartmentHead",
                 {
                     name: this.form.coordinationDepartment,
                 },
@@ -438,7 +438,7 @@ export default {
         async getdata(pageNum = 1, pageSize = 6) {
             //定义一个分页方法
             let res = await ajax(
-                "http://192.168.0.91:8080/dh-executive-tracking/searchExecutiveTracking",
+                "http://192.168.0.91:8011/dh-executive-tracking/searchExecutiveTracking",
                 {
                     pageNum,
                     pageSize,
@@ -460,7 +460,7 @@ export default {
                 );
             } else {
                 let bumen = await ajax(
-                    "http://192.168.0.91:8080/sys-dept/searchDepartmentName",
+                    "http://192.168.0.91:8011/sys-dept/searchDepartmentName",
                     {},
                     "post"
                 );
@@ -503,7 +503,7 @@ export default {
             });
             console.log(obj);
             let res = await ajax(
-                "http://192.168.0.91:8080/dh-executive-tracking/searchExecutiveTracking",
+                "http://192.168.0.91:8011/dh-executive-tracking/searchExecutiveTracking",
                 obj,
                 "post"
             );

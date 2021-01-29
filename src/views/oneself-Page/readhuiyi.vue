@@ -228,8 +228,16 @@ export default {
             reportName:obj.reportName,
             meetingDate:obj.meetingDate,
         },"get").then(res=>{
-            console.log(res.data.total)
-            this.number=res.data.total;
+            // console.log(res.data.total)
+            // this.number=res.data.total?res.data.total:0;
+            console.log(res.data.personInCharge)
+            let person=res.data.personInCharge;
+            let username=res.data.username;
+            if(person==username && res.data.total==0){
+                this.number=0
+            }else{
+                this.number=1
+            }
         })
     },
     beforeMount() {}, //生命周期 - 挂载之前
