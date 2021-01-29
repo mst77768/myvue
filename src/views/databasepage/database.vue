@@ -17,15 +17,13 @@
                         <b>{{ row.shipNameEn }}</b>
                     </template>
                 </Table>
-                <p v-show="quanxian.includes('0502:03')" id="add" @click="add">
-                    添加
-                </p>
+                <p v-show="quanflag" id="add" @click="add">添加</p>
             </div>
         </div>
-        <Modal
-            width="1600"
+        <!-- <Modal
             :draggable="true"
             v-model="flag"
+            fullscreen
             title="数据采集表单填写"
             @on-ok="ok"
             @on-cancel="cancel"
@@ -102,6 +100,121 @@
                     />
                 </div>
             </div>
+        </Modal> -->
+        <Modal
+            v-model="flag"
+            fullscreen
+            :ok-text="msg"
+            title="数据采集表单填写"
+            @on-ok="ok"
+            @on-cancel="cancel"
+        >
+            <div
+                class="contron"
+                style="
+                    width: 90%;
+                    height: 220%;
+                    margin: 10px auto;
+                    display: flex;
+                    flex-wrap: wrap;
+                "
+            >
+                <div style="display: flex;width:100%">
+                    <div
+                        style="
+                            white-space: nowrap;
+                            margin-right: 70px;
+                            margin-bottom: 0px;
+                        "
+                    >
+                        <span>船名: </span>
+                        <Select
+                            v-model="form.shipId"
+                            prefix="md-boat"
+                            placeholder="请选择船名"
+                            style="width: 180px"
+                        >
+                            <Option
+                                v-for="item in cityList"
+                                :value="item.value"
+                                :key="item.value"
+                                >{{ item.label }}</Option
+                            >
+                        </Select>
+                    </div>
+                    <div style="white-space: nowrap; margin-right: 70px">
+                        <span>日期</span>:
+                        <DatePicker
+                            type="date"
+                            :value="form.recordriqi"
+                            @on-change="getdate"
+                            placeholder="年/月/日"
+                            style="width: 180px"
+                        ></DatePicker>
+                    </div>
+                    <div style="white-space: nowrap; margin-right: 70px">
+                        <span>时间</span>:
+                        <TimePicker
+                            type="time"
+                            :value="form.recordshijian"
+                            @on-change="gettime"
+                            placeholder="时/分/秒"
+                            style="width: 180px"
+                        ></TimePicker>
+                    </div>
+                </div>
+                
+
+                <div
+                    v-for="(item, index) of titlearr"
+                    :key="index"
+                    style="
+                        display: flex;
+                        align-items: center;
+                        margin-right: 70px;
+                        width:20%;
+                        justify-content: space-between;
+                    "
+                >
+                    <span>{{ item.title }}:</span
+                    >
+                    <Input
+                        v-model="item.models"
+                        type="number"
+                        clearable
+                        style="width: 180px"
+                    />
+                </div>
+                <div style="display: flex;
+                        align-items: center;
+                        margin-right: 70px;
+                        width:20%;
+                        justify-content: space-between;">
+                    <span>轴向振动量 mm</span>:
+                    <Input
+                        v-model="form.zhouxiangzhendongliang"
+                        type="number"
+                        placeholder="轴向振动量 mm"
+                        clearable
+                        style="width: 180px"
+                    />
+                </div>
+                <div style="display: flex;
+                        align-items: center;
+                        margin-right: 70px;
+                        width:20%;
+                        justify-content: space-between;">
+                    <span>中间轴轴承温度℃</span>:
+                    <Input
+                        v-model="form.zhongjianzhouzhouchengwendu"
+                        type="number"
+                        placeholder="中间轴轴承温度℃"
+                        clearable
+                        style="width: 180px"
+                    />
+                </div>
+
+            </div>
         </Modal>
     </div>
 </template>
@@ -119,6 +232,8 @@ export default {
             hig: "",
             info: false,
             flag: false,
+            quanflag: true,
+            msg:"添加",
             axbs: 0,
             titlearr: [],
             cityList: [],
@@ -814,6 +929,7 @@ export default {
         },
         dbfn(row) {
             //双击的方法
+            this.msg="修改"
             console.log(this.quanxian);
             if (this.quanxian.includes("0502:02")) {
                 this.flag = true;
@@ -834,10 +950,13 @@ export default {
                         item.models = row[item.key];
                     }
                 });
+            } else {
+                this.$Message.warning("权限不够！");
             }
         },
         add() {
             //添加
+            this.msg="添加"
             this.flag = true;
             this.axbs = 0;
             this.titlearr.forEach((item) => {
@@ -848,9 +967,14 @@ export default {
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
-        axios.get("http://192.168.0.101:8067/equipment/sysMenu/getMenu/0502")
+        axios.defaults.headers.common["token"] =
+            "6364dec7ba6568f325d918fac1bc6d22";
+        axios
+            .get("http://192.168.0.101:8067/equipment/sysMenu/getMenu/0502")
             .then((res) => {
-                console.log(res.data);
+                console.log(res.data.data);
+                this.quanflag = res.data.data.includes("0502:03");
+                this.quanxian = res.data.data;
             });
         this.getdata();
         if (sessionStorage.getItem("cityList")) {
@@ -888,12 +1012,15 @@ export default {
     activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
 };
 </script>
-<style lang="less" scoped>
+<style lang="less" >
 .database {
     width: 99%;
     height: 99%;
     margin: 4px auto;
     font-size: 14px;
+    .ivu-modal-fullscreen .ivu-modal-footer{
+        text-align: center !important;
+    }
 
     .databox {
         width: 100%;
@@ -915,16 +1042,21 @@ export default {
                 border: 1px dashed #ccc;
                 text-align: center;
                 line-height: 35px;
+                font-weight: 800;
                 transition: all 0.3s;
-                &:hover {
-                    border-color: blue;
-                    transform: scale(1, 1.02);
-                    font-size: 15px;
-                    color: blue;
-                }
+                border-color: blue;
+                color: blue; 
+                
             }
+     
         }
+         
+       
     }
+    
+   
+    
 }
+
 </style>
     

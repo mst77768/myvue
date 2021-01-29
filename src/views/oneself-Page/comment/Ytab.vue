@@ -88,9 +88,9 @@ export default {
             let res=await ajax(`http://192.168.0.91:8080/dh-mreport/monthlyMeetingAttachmentEcho/${obj.meetingDate}/${obj.reportName}`);
             console.log(res.data.attachments)
             this.urlarr=res.data.attachments;//附件
-            if(this.urlarr.length==0){
-                this.index=1;
-            }    
+            // if(this.urlarr.length==0){
+            //     this.index=1;
+            // }    
         }
     },
     beforeCreate() {}, //生命周期 - 创建之前

@@ -35,6 +35,7 @@
             </div>
             <div class="bomt">
                 <Button size="large" type="primary" @click="add">提交</Button>
+                <Button size="large" type="warning" @click="baochun">保存</Button>
                 <Button
                     size="large"
                     type="success"
@@ -154,6 +155,9 @@ export default {
                 });
             }
         },
+        baochun(){
+            
+        },
         upload() {
             let obj = JSON.parse(sessionStorage.getItem("wenjiantype"));
 
@@ -251,7 +255,7 @@ export default {
     }
 
     .bomt {
-        width: 23%;
+        width: 33%;
         display: flex;
         margin: 15px auto;
         margin-top: 9.6rem;

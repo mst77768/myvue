@@ -2,7 +2,7 @@
 <template>
     <div class="addpage">
         <div class="xinbox">
-            <div class="top">新增会议报告</div>
+            <div class="top">{{text}}会议报告</div>
             <div class="inputbox">
                 <div class="itme">
                     <b>报告类型：</b>
@@ -36,13 +36,13 @@
                         v-model="form.reportName"
                         placeholder="请输入..."
                         style="width: 4.54rem"
-                        @on-change="text"
+                        @on-change="text1"
                     />
                 </div>
             </div>
             <div class="addmain">
                 <!-- 这里是tab两个大的自定义组件 -->
-                <tab1 v-if="form.reportType === '周例会'" @fn="fn1" />
+                <tab1 v-if="form.reportType === '周例会'" @fn="fn1" @fb="fn2" />
                 <tab2 v-else />
             </div>
         </div>
@@ -64,6 +64,7 @@ export default {
     data() {
         //这里存放数据
         return {
+            text:"添加",
             cityList: [
                 {
                     value: "周例会",
@@ -94,55 +95,120 @@ export default {
         fn1(data) {
             //拿到儿子传的值
             var str = localStorage.getItem("tab1") || "[]";
-            let arr=JSON.parse(str);
-            let newarr=[];
-            arr.forEach(item => {
-                let obj={
-                    deptName:item.name,
-                    reportContent:item.reportContent,
-                    reportName:this.form.reportName,
-                    meetingDate:this.form.meetingDate
-                }
-                newarr.push(obj)
+            let arr = JSON.parse(str);
+            let newarr = [];
+            arr.forEach((item) => {
+                let obj = {
+                    deptName: item.name,
+                    reportContent: item.reportContent,
+                    reportName: this.form.reportName,
+                    meetingDate: this.form.meetingDate,
+                };
+                newarr.push(obj);
             });
             newarr.push({
-                deptName:"总裁",
-                reportContent:data.textarea,
-                reportName:this.form.reportName,
-                meetingDate:this.form.meetingDate
-            })
-            console.log(newarr)
+                deptName: "总裁",
+                reportContent: data.textarea,
+                reportName: this.form.reportName,
+                meetingDate: this.form.meetingDate,
+            });
+            console.log(newarr);
             let obj = JSON.parse(JSON.stringify(this.form));
-           
-            let bak = Object.assign(obj, data);//添加会议报告内容
-            console.log(newarr)
-            ajax("http://192.168.0.90:8011/dh-meeting-title/saveMreport",newarr,"post").then(date=>{
-                console.log(date);
-            })
+
+            let bak = Object.assign(obj, data); //添加会议报告内容
+            bak["reportStatus"] = 2;
+            console.log(newarr);
+            console.log(bak);
             ajax(
-                "http://192.168.0.90:8011/dh-meeting-title/saveMeeting",//添加会议表头
+                "http://192.168.0.90:8011/dh-meeting-title/saveMreport",
+                newarr,
+                "post"
+            ).then((date) => {
+                console.log(date);
+            });
+            ajax(
+                "http://192.168.0.90:8011/dh-meeting-title/saveMeeting", //添加会议表头
                 bak,
                 "post"
             ).then((data) => {
                 console.log(data);
             });
-            sessionStorage.removeItem("meet");//用完把他删除
+            sessionStorage.removeItem("meet"); //用完把他删除
+        },
+        fn2(data) {
+            //拿到儿子传的值
+            var str = localStorage.getItem("tab1") || "[]";
+            let arr = JSON.parse(str);
+            let newarr = [];
+            arr.forEach((item) => {
+                let obj = {
+                    deptName: item.name,
+                    reportContent: item.reportContent,
+                    reportName: this.form.reportName,
+                    meetingDate: this.form.meetingDate,
+                };
+                newarr.push(obj);
+            });
+            newarr.push({
+                deptName: "总裁",
+                reportContent: data.textarea,
+                reportName: this.form.reportName,
+                meetingDate: this.form.meetingDate,
+            });
+            console.log(newarr);
+            let obj = JSON.parse(JSON.stringify(this.form));
+
+            let bak = Object.assign(obj, data); //添加会议报告内容
+            bak["reportStatus"] = 1;
+            console.log(newarr);
+            console.log(bak);
+            ajax(
+                "http://192.168.0.90:8011/dh-meeting-title/saveMreport",
+                newarr,
+                "post"
+            ).then((date) => {
+                console.log(date);
+            });
+            ajax(
+                "http://192.168.0.90:8011/dh-meeting-title/saveMeeting", //添加会议表头
+                bak,
+                "post"
+            ).then((data) => {
+                console.log(data);
+            });
+            sessionStorage.removeItem("meet"); //用完把他删除
         },
         getdate(date) {
             this.form.meetingDate = date;
-            sessionStorage.setItem("wenjiantype",JSON.stringify(this.form))
+            sessionStorage.setItem("wenjiantype", JSON.stringify(this.form));
         },
-        text(){
-           sessionStorage.setItem("wenjiantype",JSON.stringify(this.form))
-        }
+        text1() {
+            sessionStorage.setItem("wenjiantype", JSON.stringify(this.form));
+        },
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
-        if(sessionStorage.getItem("perform")){
-            this.form=JSON.parse(sessionStorage.getItem("perform"))
+        // if(this.$route)
+        
+        if (sessionStorage.getItem("perform")) {
+            this.form = JSON.parse(sessionStorage.getItem("perform"));
         }
-        sessionStorage.setItem("wenjiantype",JSON.stringify(this.form))
+        sessionStorage.setItem("wenjiantype", JSON.stringify(this.form));
+        let index=this.$route.query.index;
+        console.log(index==undefined)
+        if(index==undefined){
+            this.text="添加"
+        }else{
+            this.text="修改"
+            if(index==0){
+            this.form.reportType="周例会"
+        }else{
+            this.form.reportType="月度会议"
+        }
+        }
+        
+       
     },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
@@ -152,16 +218,17 @@ export default {
     beforeDestroy() {}, //生命周期 - 销毁之前
     destroyed() {}, //生命周期 - 销毁完成
     activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
-    beforeRouteLeave(to, from, next) {//组件里面的路由守卫
-       if(to.path=="/person"){
-           sessionStorage.setItem("perform",JSON.stringify(this.form))
-           next()
-       }else{
-           if(sessionStorage.getItem("perform")){
-               sessionStorage.removeItem("perform")
-           }
-           next()
-       }
+    beforeRouteLeave(to, from, next) {
+        //组件里面的路由守卫
+        if (to.path == "/person") {
+            sessionStorage.setItem("perform", JSON.stringify(this.form));
+            next();
+        } else {
+            if (sessionStorage.getItem("perform")) {
+                sessionStorage.removeItem("perform");
+            }
+            next();
+        }
     },
 };
 </script>

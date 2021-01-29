@@ -118,6 +118,7 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
+import ExportJsonExcel from "js-export-excel";
 import ajax from "@/api/ajax.js";
 export default {
     //import引入的组件需要注入到对象中才能使用
@@ -342,10 +343,118 @@ export default {
         },
         updta() {
             //该方法用于打印表格数据
-            console.log(this.$refs.tables.exportCsv);
-            this.$refs.tables.exportCsv({
-                filename: `table-${new Date().valueOf()}.csv`,
-            });
+            // console.log(this.$refs.tables.exportCsv);
+            // this.$refs.tables.exportCsv({
+            //     filename: `table-${new Date().valueOf()}.csv`,
+            // });
+            const data = this.data3 ? this.data3 : ""; //表格数据
+            var option = {};
+            let dataTable = [];
+            if (data) {
+                for (let i in data) {
+                    if (data) {
+                        let obj = {
+                            月份: data[i].updateTime,
+                            船名: data[i].vesselNo,
+                            航次号: data[i].voyageNo,
+                            预算TC: data[i].budgetTc,
+                            海务主管: data[i].vesselType,
+                            运费: data[i].freight,
+                            滞期费: data[i].demurrage,
+                            佣金比例: data[i].commissionRatio,
+                            其他费用: data[i].otherMoney,
+                            装港1港使费: data[i].zg1,
+                            卸港1港使费: data[i].xg1,
+                            装港2港使费: data[i].zg2,
+                            卸港2港使费: data[i].xg2,
+                            装港3港使费: data[i].zg3,
+                            卸港3港使费:data[i].xg3,
+                            装港4港使费:data[i].zg4,
+                            卸港4港使费:data[i].xg4,
+                            装港5港使费:data[i].zg5,
+                            卸港5港使费:data[i].xg5,
+                            offhire开始时间:data[i].offhireStartTime,
+                            offhire结束时间:data[i].offhireEndTime,
+                            间接offhire开始时间:data[i].indirectOffhireStartTime,
+                            间接offhire结束时间:data[i].indirectOffhireStartTime,
+                            营运时间加油船舶抵达锚地时间:data[i].droppedAnchor,
+                            营运时间加油结束时间:data[i].refuelingShipEndTime,
+                            加油绕航距离:data[i].rgDistance,
+                            创建时间:data[i].createTime,
+                        };
+                        dataTable.push(obj);
+                    }
+                }
+            }
+            option.fileName = "海务填报表";
+            option.datas = [
+                {
+                    sheetData: dataTable,
+                    sheetName: "sheet",
+                    sheetFilter: [
+                        "月份",
+                        "船名",
+                        "航次号",
+                        "预算TC",
+                        "海务主管",
+                        "运费",
+                        "滞期费",
+                        "佣金比例",
+                        "其他费用",
+                        "装港1港使费",
+                        "卸港1港使费",
+                        "装港2港使费",
+                        "卸港2港使费",
+                        "装港3港使费",
+                        "卸港3港使费",
+                        "装港4港使费",
+                        "卸港4港使费",
+                        "装港5港使费",
+                        "卸港5港使费",
+                        "offhire开始时间",
+                        "offhire结束时间",
+                        "间接offhire开始时间",
+                        "间接offhire结束时间",
+                        "营运时间加油船舶抵达锚地时间",
+                        "营运时间加油结束时间",
+                        "加油绕航距离",
+                        "创建时间",
+
+                    ],
+                    sheetHeader: [
+                        "月份",
+                        "船名",
+                        "航次号",
+                        "预算TC",
+                        "海务主管",
+                        "运费",
+                        "滞期费",
+                        "佣金比例",
+                        "其他费用",
+                        "装港1港使费",
+                        "卸港1港使费",
+                        "装港2港使费",
+                        "卸港2港使费",
+                        "装港3港使费",
+                        "卸港3港使费",
+                        "装港4港使费",
+                        "卸港4港使费",
+                        "装港5港使费",
+                        "卸港5港使费",
+                        "offhire开始时间",
+                        "offhire结束时间",
+                        "间接offhire开始时间",
+                        "间接offhire结束时间",
+                        "营运时间加油船舶抵达锚地时间",
+                        "营运时间加油结束时间",
+                        "加油绕航距离",
+                        "创建时间",
+                    ],
+                },
+            ];
+            var toExcel = new ExportJsonExcel(option);
+            toExcel.saveExcel();
+
         },
         async getdata(form) {
             //该方法用于请求数据

@@ -113,6 +113,14 @@
                     </div>
                 </div>
                 <Button type="primary" @click="seach">查询</Button>
+                <div class="item" style="margin-left:60px">
+                        <b>关键字：</b>
+                        <Input
+                            v-model="form.retrieval"
+                            placeholder="请输入"
+                            style="width: 4.54rem"
+                        />
+                    </div>
             </div>
             <div class="tablebox1">
                 <div class="top1">
@@ -226,6 +234,7 @@ export default {
                 leading_cadre: "",
                 coordination_department: "",
                 coordinator: "",
+                retrieval:"",
                 pageNum: 1,
                 pageSize: 6,
             },
@@ -479,9 +488,12 @@ export default {
         },
         async seach() {
             //检索的方法
-
+            
             let obj = JSON.parse(JSON.stringify(this.form));
-
+           if(obj.retrieval.trim()!="" && obj.retrieval.trim().length<2){
+               this.$Message.warning('关键字不能少于两个！');
+               return false
+           }
             this.xietiao.forEach((item) => {
                 if (item.value == obj.coordinationDepartment) {
                     obj.coordinationDepartment = item.label;
@@ -501,7 +513,7 @@ export default {
             let arr = res.data.pageInfo.list;
             arr.forEach((item, index) => {
                 //给数组对象的加个新字段
-                item["id"] = index + 1;
+                item["name"] = index + 1;
             });
             this.data1 = arr; //获取数据
         },
@@ -612,6 +624,7 @@ export default {
                     justify-content: flex-end;
                     width: 97%;
                     margin-top: 0.5rem;
+                   
                 }
             }
         }

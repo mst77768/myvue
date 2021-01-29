@@ -78,7 +78,7 @@ uuid: "1111",
                 }
                 console.log(res.data.data.token)
                 sessionStorage.setItem("token",res.data.data.token)
-                axios.defaults.headers.common["token"] = res.data.data.token;
+                 axios.defaults.headers.common["token"] = res.data.data.token;
                 axios.get("http://192.168.0.90:9090/Auth/sys/user/getLoginUser").then(res=>{
                     console.log(res)
                 })

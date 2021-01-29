@@ -109,15 +109,16 @@
                                 <a :href="item.fileUrl" :title="item.attachmentsName" :download="item.attachmentsName"  >{{item.attachmentsName}}</a>
                             </p>
                         </div>
-                        <p class="text">已确认部门:<b>{{totle}}</b></p>
+                        <p class="text">已确认部门:<b @click="$router.push('/pertale')">{{totle}}</b></p>
                     </div>
                     <div class="botm">
                         <Button
                             size="large"
                             type="primary"
-                            @click="$router.push('/huiyi')"
-                            >返回首页</Button
+                            @click="btn"
+                            >{{textarr[number]}}</Button
                         >
+                       
                     </div>
                 </div>
             </div>
@@ -137,6 +138,8 @@ export default {
         return {
             boss:"",
             totle:3,
+            number:0,
+            textarr:["确认完成","返回首页"],
             defaultList: [
                 
             ],
@@ -151,13 +154,12 @@ export default {
                 {
                     title: "本周汇报及需要协调事项",
                     slot: "reportContent",
-                   width: "720",
+                    width: "720",
                     align: "center",
                 },
                 {
                     title: "操作",
                     slot: "operation",
-                    
                     align: "center",
                 },
             ],
@@ -179,6 +181,23 @@ export default {
         },
         gof(){
           console.log(this.$refs.bin)
+        },
+        btn(){//
+        let obj=JSON.parse(sessionStorage.getItem("look"))
+           if(this.number){
+               this.$router.push("huiyi")
+           }else{
+               this.number=1;
+               ajax("http://192.168.0.90:8011/sys-user/SysDeptUser",{
+                   reportName:obj.reportName,
+                   meetingDate:obj.meetingDate,
+               },"get").then(res=>{
+                //    console.log(res.code==200)
+                   if(res.code==200){
+                         this.$Message.success('确认已成功！');
+                   }
+               })
+           }
         }
        
     },
@@ -196,26 +215,22 @@ export default {
             },
             "get"
         ).then((data) => {
-            // console.log(data.data.DeptTotal)
             this.totle=data.data.DeptTotal
             let arr=data.data.Annex;
             console.log(arr)
-            this.defaultList=arr
-            // let newarr=[]
-            // for(let i=0;i<arr.length;i++){
-            //     let obj={
-            //         name:arr[i].attachmentsName,
-            //         url:arr[],
-            //     }
-            //     newarr.push(obj)
-            // }
-            // this.defaultList=newarr
-            
+            this.defaultList=arr  
           this.boss=data.data.Report.pop().reportContent;
             this.data1=data.data.Report
             console.log(data.data.MeTile[0]);
             this.header=data.data.MeTile[0]
         });
+        ajax("http://192.168.0.90:8011/dh-mdept-consult/finalTotal",{
+            reportName:obj.reportName,
+            meetingDate:obj.meetingDate,
+        },"get").then(res=>{
+            console.log(res.data.total)
+            this.number=res.data.total;
+        })
     },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）

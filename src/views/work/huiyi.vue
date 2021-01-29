@@ -78,21 +78,13 @@
                                 >
                             </Tooltip>
                         </template>
-                        <template slot-scope="{ index }" slot="action">
+                        <template slot-scope="{ row }" slot="action">
                             <Tooltip
                                 content="求修改！"
                                 placement="top-start"
                                 theme="light"
                             >
-                                <Icon type="ios-create" @click="dyin(index)" />
-                            </Tooltip>
-
-                            <Tooltip
-                                content="当前状态"
-                                placement="top-start"
-                                theme="light"
-                            >
-                                <Icon type="md-checkmark-circle" />
+                                <Icon type="ios-create" @click="dyin(row)" />
                             </Tooltip>
                         </template>
                     </Table>
@@ -175,6 +167,7 @@ export default {
                     title: "地点",
                     key: "meetingPlace",
                     align: "center",
+                    minWidth:170,
                 },
                 {
                     title: "附件",
@@ -235,8 +228,13 @@ export default {
     watch: {},
     //方法集合
     methods: {
-        dyin(index) {
-            this.$Message.info(`打印第${index + 1}行数据`);
+        dyin(row) {
+            sessionStorage.setItem("look",JSON.stringify(row));
+            if(row.reportType==="周例会"){
+              this.$router.push("/adwenjian?index=0")
+            }else if(row.reportType==="月度会议"){
+                this.$router.push(`/adwenjian?index=1`);
+            }
         },
         golook(row) {
             sessionStorage.setItem("look",JSON.stringify(row));
@@ -306,7 +304,6 @@ export default {
     height: 99%;
     margin: 4px auto;
     font-size: 0.42rem;
-
     .tabbox {
         width: 100%;
         height: 97%;

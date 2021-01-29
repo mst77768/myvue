@@ -88,6 +88,7 @@
         </div>
         <div class="botm">
             <Button size="large" type="primary" @click="hhh">提交</Button>
+            <Button size="large" type="warning" @click="baochun">保存</Button>
             <Button size="large" type="success" @click="$router.push('huiyi')"
                 >取消</Button
             >
@@ -98,7 +99,7 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-import ajax from "@/api/ajax.js"
+import ajax from "@/api/ajax.js";
 export default {
     //import引入的组件需要注入到对象中才能使用
     components: {},
@@ -110,7 +111,7 @@ export default {
             da: {
                 meetingDate: "",
                 reportName: "",
-                token:"",
+                token: "",
             },
             columns1: [
                 {
@@ -145,9 +146,7 @@ export default {
     //监听属性 类似于data概念
     computed: {},
     //监控data中的数据变化
-    watch: {
-        
-    },
+    watch: {},
     //方法集合
     methods: {
         add() {
@@ -179,6 +178,11 @@ export default {
             localStorage.setItem("tab1", JSON.stringify(arr));
             this.$emit("fn", this.form); //子传父亲
         },
+        baochun() {
+            let arr = JSON.parse(JSON.stringify(this.data1));
+            localStorage.setItem("tab1", JSON.stringify(arr));
+            this.$emit("fb", this.form); //子传父亲
+        },
         goperon() {
             sessionStorage.setItem(
                 "meet",
@@ -190,7 +194,7 @@ export default {
             let obj = JSON.parse(sessionStorage.getItem("wenjiantype")); //拿到父亲里面的值
             this.da.meetingDate = obj.meetingDate;
             this.da.reportName = obj.reportName;
-            this.da=sessionStorage.getItem("token");
+            this.da.token = sessionStorage.getItem("token");
             if (!this.da.meetingDate) {
                 this.$Notice.warning({
                     title: "系统提醒！",
@@ -219,24 +223,25 @@ export default {
                 desc: res.msg,
             });
         },
-        bginupdata(file) {//上传文件之前的钩子函数
+        bginupdata(file) {
+            //上传文件之前的钩子函数
             console.log(file);
-            let flag=true;
+            let flag = true;
             this.filelist.forEach((item) => {
                 if (item.name == file.name) {
-                    flag=false;
+                    flag = false;
                     this.$Notice.info({
                         title: "系统提醒！",
                         desc: "上传文件重复！请重新上传文件！",
-                    });  
+                    });
                 }
             });
-            if(!flag){
-               return false
+            if (!flag) {
+                return false;
             }
-            
         },
-        sucessupdata(req, file, filelist) {//上传文件成功的钩子函数
+        sucessupdata(req, file, filelist) {
+            //上传文件成功的钩子函数
             console.log(req);
             console.log(file);
             console.log(filelist);
@@ -250,8 +255,34 @@ export default {
             (data) => {
                 console.log(data.data.sysDept);
                 this.data1 = data.data.sysDept.slice(0, -1); //把数组截取
+                let obj = JSON.parse(sessionStorage.getItem("look"));
+                ajax(
+                    "http://192.168.0.90:8011/dh-mreport/SelReport", //添加接口
+                    {
+                        reportType: obj.reportType,
+                        reportName: obj.reportName,
+                        meetingDate: obj.meetingDate,
+                    },
+                    "get"
+                ).then((res) => {
+                    // this.totle=data.data.DeptTotal
+                    // let arr=data.data.Annex;
+                    console.log(this.data1)
+                    console.log(res.data.Report);
+                     let arr = res.data.Report;
+                    arr.forEach((item,index)=>{
+                         this.data1[index].reportName=item.reportContent;
+                        // console.log(item.reportContent)
+                    })
+                    //     this.defaultList=arr
+                    //   this.boss=data.data.Report.pop().reportContent;
+                    //     this.data1=data.data.Report
+                    //     console.log(data.data.MeTile[0]);
+                    //     this.header=data.data.MeTile[0]
+                });
             }
         );
+        console.log(JSON.parse(sessionStorage.getItem("look")));
     },
     beforeMount() {}, //生命周期 - 挂载之前
     //生命周期 - 挂载完成（可以访问DOM元素）
@@ -339,7 +370,7 @@ export default {
     }
 
     .botm {
-        width: 23%;
+        width: 33%;
         display: flex;
         margin: 15px auto;
         justify-content: space-between;
