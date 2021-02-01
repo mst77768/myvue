@@ -251,6 +251,7 @@ export default {
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
+        sessionStorage.removeItem("person");
         ajax("http://192.168.0.90:8011/sys-dept/SysDept", "get").then(
             (data) => {
                 console.log(data.data.sysDept);

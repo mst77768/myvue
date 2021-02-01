@@ -186,6 +186,17 @@
                                 >
                             </Poptip>
                         </template>
+                        <template slot-scope="{ row }" slot="prescriptionType">
+                         <span v-if="row.prescriptionType">
+                             时效
+                             </span>   
+                        <span v-else>
+                            
+                            非时效
+                            </span>   
+                        
+                        </template>
+                        
                     </Table>
                     <div class="botm">
                         <Page
@@ -224,7 +235,7 @@ export default {
             index: 0,
             zheren: [],
             xietiao: [],
-            flag:true,
+            flag: true,
             form: {
                 source: "", //来源
                 releaseTime: "",
@@ -234,7 +245,7 @@ export default {
                 leading_cadre: "",
                 coordination_department: "",
                 coordinator: "",
-                retrieval:"",
+                retrieval: "",
                 pageNum: 1,
                 pageSize: 6,
             },
@@ -312,22 +323,23 @@ export default {
                 },
                 {
                     title: "发布日期",
-                    key: "meetingDate",
+                    key: "releaseTime",
                     align: "center",
                     width: "120",
+                    tooltip: true,
                 },
                 {
                     title: "时效类型",
-                    key: "prescriptionType",
+                    slot: "prescriptionType",
                     align: "center",
                     width: "120",
                 },
                 {
                     title: "要求完成时间",
-                    key: "releaseTime",
+                    key: "requiredCompletionTime",
                     align: "center",
                     width: "140",
-                    tooltip:true
+                    tooltip: true,
                 },
                 {
                     title: "汇报频率",
@@ -376,7 +388,7 @@ export default {
                     key: "informationNote",
                     align: "center",
                     width: "180",
-                    tooltip:true
+                    tooltip: true,
                 },
                 {
                     title: "附件总数",
@@ -427,13 +439,14 @@ export default {
         goupdata(index) {
             //跳转到附件的页面
             console.log(index);
-             this.$router.push(`/wenjian?text=${index.id}`);
+            this.$router.push(`/wenjian?text=${index.id}`);
         },
         fn2(a, b) {
             this.index = b;
-            this.flag=false
+            this.flag = false;
             console.log(a);
-            sessionStorage.setItem("wenID",JSON.stringify(a.id));
+            sessionStorage.setItem("wenID", JSON.stringify(a.id));
+            sessionStorage.setItem("weninfo",JSON.stringify({Status:a.completionStatus,info:a.informationNote}))
         },
         async getdata(pageNum = 1, pageSize = 6) {
             //定义一个分页方法
@@ -445,10 +458,10 @@ export default {
                 },
                 "post"
             );
-            console.log(res)
+            console.log(res);
             this.count = parseInt(res.data.pageInfo.total);
             let arr = res.data.pageInfo.list;
-            console.log(arr)
+            console.log(arr);
             arr.forEach((item, index) => {
                 //给数组对象的加个新字段
                 item["name"] = index + 1;
@@ -488,12 +501,12 @@ export default {
         },
         async seach() {
             //检索的方法
-            
+
             let obj = JSON.parse(JSON.stringify(this.form));
-           if(obj.retrieval.trim()!="" && obj.retrieval.trim().length<2){
-               this.$Message.warning('关键字不能少于两个！');
-               return false
-           }
+            if (obj.retrieval.trim() != "" && obj.retrieval.trim().length < 2) {
+                this.$Message.warning("关键字不能少于两个！");
+                return false;
+            }
             this.xietiao.forEach((item) => {
                 if (item.value == obj.coordinationDepartment) {
                     obj.coordinationDepartment = item.label;
@@ -508,7 +521,7 @@ export default {
                 "post"
             );
             console.log(res);
-            console.log(res.data.pageInfo.list)
+            console.log(res.data.pageInfo.list);
             this.count = parseInt(res.data.pageInfo.total);
             let arr = res.data.pageInfo.list;
             arr.forEach((item, index) => {
@@ -624,7 +637,6 @@ export default {
                     justify-content: flex-end;
                     width: 97%;
                     margin-top: 0.5rem;
-                   
                 }
             }
         }

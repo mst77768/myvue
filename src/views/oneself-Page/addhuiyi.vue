@@ -2,7 +2,7 @@
 <template>
     <div class="addpage">
         <div class="xinbox">
-            <div class="top">{{text}}会议报告</div>
+            <div class="top">添加会议报告</div>
             <div class="inputbox">
                 <div class="itme">
                     <b>报告类型：</b>
@@ -131,7 +131,13 @@ export default {
                 bak,
                 "post"
             ).then((data) => {
-                console.log(data);
+                console.log(data.code);
+                if(data.code==200){
+                    this.$router.go(-1);
+                    this.$Message.success('添加成功！已提交');
+                }else{
+                    this.$Message.error(data.msg)
+                }
             });
             sessionStorage.removeItem("meet"); //用完把他删除
         },
@@ -174,7 +180,13 @@ export default {
                 bak,
                 "post"
             ).then((data) => {
-                console.log(data);
+                console.log(data.code);
+                if(data.code==200){
+                    this.$Message.success('添加成功！');
+                    this.$router.go(-1);
+                }else{
+                    this.$Message.error(data.msg);
+                }
             });
             sessionStorage.removeItem("meet"); //用完把他删除
         },
@@ -195,18 +207,18 @@ export default {
             this.form = JSON.parse(sessionStorage.getItem("perform"));
         }
         sessionStorage.setItem("wenjiantype", JSON.stringify(this.form));
-        let index=this.$route.query.index;
-        console.log(index==undefined)
-        if(index==undefined){
-            this.text="添加"
-        }else{
-            this.text="修改"
-            if(index==0){
-            this.form.reportType="周例会"
-        }else{
-            this.form.reportType="月度会议"
-        }
-        }
+        // let index=this.$route.query.index;
+        // console.log(index==undefined)
+        // if(index==undefined){
+        //     this.text="添加"
+        // }else{
+        //     this.text="修改"
+        //     if(index==0){
+        //     this.form.reportType="周例会"
+        // }else{
+        //     this.form.reportType="月度会议"
+        // }
+        //}
         
        
     },

@@ -34,8 +34,12 @@
                 </Upload>
             </div>
             <div class="bomt">
-                <Button size="large" type="primary" @click="add">提交</Button>
-                <Button size="large" type="warning" @click="baochun">保存</Button>
+                <Button size="large" type="primary" @click="add(2)"
+                    >提交</Button
+                >
+                <Button size="large" type="warning" @click="add(1)"
+                    >保存</Button
+                >
                 <Button
                     size="large"
                     type="success"
@@ -84,10 +88,8 @@ export default {
             ],
             fileurl: {
                 attachmentsName: "", //附件名称
-                department: "数据化研发部门",
                 fileUrl: "", //附件地址
                 meetingDate: "", //时间
-                personnel: "李兴波",
                 reportName: "", //报告名称
             },
             filearr: [],
@@ -102,24 +104,27 @@ export default {
         fn(index) {
             this.index = index;
         },
-        add() {
+        add(number) {
             //提交操作
             let obj = JSON.parse(sessionStorage.getItem("wenjiantype"));
             let obj2 = JSON.parse(sessionStorage.getItem("enddata"));
             obj["meetingPlace"] = "大会议室";
             obj["reportType"] = "月度会议";
+
             console.log(obj);
+            console.log(obj2);
             let form = {
                 ...obj,
-                ...obj2,
                 titleName: "月度总结",
-                reportContent: this.arr[this.arr.length - 1].value6,
-                reportTitle: this.arr[this.arr.length - 1].value16,
+                reportContent: obj2.value6,
+                reportTitle: obj2.value16,
             };
+             obj["reportStatus"] = number;
+            console.log(form);
             if (sessionStorage.getItem("arrlength") == 1) {
                 ajax(
                     "http://192.168.0.91:8011/dh-meeting-title/saveMonthlyMeetingHeader",
-                    obj,
+                   obj,
                     "post"
                 ).then((res) => {
                     console.log(res);
@@ -139,6 +144,13 @@ export default {
                     });
                 });
             } else {
+                ajax("http://192.168.0.91:8011/dh-meeting-title/updateMonthlyMeetingHeader",{
+                     meetingDate: obj.meetingDate,
+                        reportName: obj.reportName,
+                        reportStatus: number,
+                },"post").then(res=>{
+                    console.log(res)
+                })
                 ajax(
                     "http://192.168.0.91:8011/dh-mreport/saveMonthlyMeetingSmallContent",
                     form,
@@ -155,9 +167,7 @@ export default {
                 });
             }
         },
-        baochun(){
-            
-        },
+
         upload() {
             let obj = JSON.parse(sessionStorage.getItem("wenjiantype"));
 
@@ -180,7 +190,7 @@ export default {
             console.log(file);
             console.log(filearr);
         },
-        removefile(file,filearr){
+        removefile(file, filearr) {
             let arr = [];
             for (let i = 0; i < filearr.length; i++) {
                 this.fileurl.fileUrl =
@@ -190,19 +200,24 @@ export default {
                 arr.push(JSON.parse(JSON.stringify(this.fileurl)));
             }
             this.filearr = arr;
-            let obj={
-                originalFilename:file.name,
-                fileUrl:file.response.data.uploadDto.fileUrl
-            }
-            ajax("http://192.168.0.91:8011/ossservice/oss/delete",obj,"post").then(res=>{//删除功能
-                console.log(res.code)
-                if(res.code==200){ 
-                   this.$Message.success('文件删除成功！');
+            let obj = {
+                originalFilename: file.name,
+                fileUrl: file.response.data.uploadDto.fileUrl,
+            };
+            ajax(
+                "http://192.168.0.91:8011/ossservice/oss/delete",
+                obj,
+                "post"
+            ).then((res) => {
+                //删除功能
+                console.log(res.code);
+                if (res.code == 200) {
+                    this.$Message.success("文件删除成功！");
                 }
-            })
+            });
             console.log(file);
-            console.log(filearr)
-        }
+            console.log(filearr);
+        },
     },
     beforeCreate() {}, //生命周期 - 创建之前
     //生命周期 - 创建完成（可以访问当前this实例）

@@ -215,10 +215,6 @@ export default {
                     value: "4",
                     label: "已审核",
                 },
-                {
-                    value: "5",
-                    label: "已确定",
-                },
             ],
         };
     },
@@ -231,9 +227,9 @@ export default {
         dyin(row) {
             sessionStorage.setItem("look",JSON.stringify(row));
             if(row.reportType==="周例会"){
-              this.$router.push("/adwenjian?index=0")
+              this.$router.push("/updatehuiyi")
             }else if(row.reportType==="月度会议"){
-                this.$router.push(`/adwenjian?index=1`);
+                this.$router.push(`/updateyue`);
             }
         },
         golook(row) {

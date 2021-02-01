@@ -143,7 +143,6 @@ export default {
             defaultList: [
                 
             ],
-            
             columns1: [
                 {
                     title: "部门名称",
@@ -195,6 +194,9 @@ export default {
                 //    console.log(res.code==200)
                    if(res.code==200){
                          this.$Message.success('确认已成功！');
+                         this.$router.push("huiyi");
+                   }else{
+                       this.$Message.err("");
                    }
                })
            }

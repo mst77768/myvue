@@ -90,10 +90,8 @@ export default {
             },
             form2: {
                 attachmentsName: "",
-                department: "数据化研发中心",
                 detId: "",
-                fileUrl: "",
-                personnel: "李兴波",
+                fileUrl: "", 
             },
             columns1: [
                 {
@@ -217,8 +215,12 @@ export default {
         // let arr = JSON.parse(sessionStorage.getItem("data"));
         // console.log(arr);
         // let obj = arr[this.$route.query.text];
-        // console.log(obj.id);
-        // this.form.id =this.form2.detId= obj.id;
+        //  console.log(obj.id);
+         let obj=JSON.parse(sessionStorage.getItem("weninfo"));
+        //  console.log(obj);
+         this.form.completionStatus=obj.Status;
+         this.form.informationNote=obj.info;
+         this.form.id =JSON.parse(sessionStorage.getItem("wenID"))
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后

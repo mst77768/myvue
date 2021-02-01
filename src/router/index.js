@@ -69,6 +69,12 @@ const routes = [{
   },{
      path:"/pertale",//确认人员记录页面
      component:()=>import("../views/oneself-Page/pertable.vue")
+  },{
+    path:"/updatehuiyi",//修改周例会页面
+    component:()=>import("../views/oneself-Page/updatezou.vue")
+  },{
+    path:"/updateyue",//修改月度会议的页面
+    component:()=>import("../views/oneself-Page/updateyue.vue")
   }
 
 ];
