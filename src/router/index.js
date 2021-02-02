@@ -39,6 +39,9 @@ const routes = [{
     },{
       path:"iframe",//嵌入页面
       component:()=>import("../views/databasepage/iframe.vue")
+    },{
+      path:"lh",
+      component:()=>import("../views/work/lh.vue")
     }] 
   },
   // 下面都是一级路由
@@ -75,7 +78,9 @@ const routes = [{
   },{
     path:"/updateyue",//修改月度会议的页面
     component:()=>import("../views/oneself-Page/updateyue.vue")
-  }
+  },
+    
+  
 
 ];
 

@@ -109,7 +109,7 @@
                                 <a :href="item.fileUrl" :title="item.attachmentsName" :download="item.attachmentsName"  >{{item.attachmentsName}}</a>
                             </p>
                         </div>
-                        <p class="text">已确认部门:<b @click="$router.push('/pertale')">{{totle}}</b></p>
+                        <p class="text">已确认部门:<b @click="golook">{{totle}}</b></p>
                     </div>
                     <div class="botm">
                         <Button
@@ -141,7 +141,6 @@ export default {
             number:0,
             textarr:["确认完成","返回首页"],
             defaultList: [
-                
             ],
             columns1: [
                 {
@@ -200,6 +199,10 @@ export default {
                    }
                })
            }
+        },
+        golook(){
+           sessionStorage.setItem("headerubd",JSON.stringify(this.header));
+           this.$router.push('/pertale');
         }
        
     },
@@ -371,6 +374,7 @@ export default {
                         b {
                             color: blue;
                             margin-left: 0.23rem;
+                            cursor: pointer;
                         }
                     }
                 }

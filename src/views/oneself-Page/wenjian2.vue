@@ -63,7 +63,7 @@
                 </div>
                 <div class="mbotm">
                     <Button type="primary" @click="nb">提交</Button>
-                    <Button type="warning">取消</Button>
+                    <Button type="warning" @click="$router.go(-1)">取消</Button>
                 </div>
             </div>
         </div>
@@ -80,9 +80,10 @@ export default {
     data() {
         //这里存放数据
         return {
-            tab: true,
+            tab: false,
             flag: true,
             defaultList: [],
+            urllist:[],
             form: {
                 completionStatus: "",
                 informationNote: "",
@@ -93,6 +94,7 @@ export default {
                 detId: "",
                 fileUrl: "", 
             },
+
             columns1: [
                 {
                     title: "完成情况",
@@ -147,26 +149,20 @@ export default {
     watch: {},
     //方法集合
     methods: {
-        fn(res, file, filelist) {
+        fn(res) {
             //钩子函数上传成功就调用此方法了
             console.log(res.data.uploadDto.fileUrl);
-            console.log(res.data.uploadDto.originalFilename)
-            this.form2.attachmentsName=res.data.uploadDto.originalFilename;//文件名称
-            this.form2.fileUrl=res.data.uploadDto.fileUrl
-            this.tab = false;
-            console.log(file);
-            console.log(filelist);
-            let arr=[];
-            for(let i=0;i<filelist.length;i++){
-                this.form2.fileUrl=filelist[i].response.data.uploadDto.fileUrl
-                this.form2.originalFilename=filelist[i].name
-                arr.push(JSON.parse(JSON.stringify(this.form2)))
+            // res.data.uploadDto['attachmentsName']=res.data.uploadDto.originalFilename
+            let obj={
+                attachmentsName:res.data.uploadDto.originalFilename,
+                fileUrl:res.data.uploadDto.fileUrl,
+                detId:this.form2.detId
             }
-            this.arr=arr;
+            this.arr.push(obj)
         },
         async nb() {
             this.flag = false;
-           
+            console.log(this.arr)
             if (this.tab) {
                 let res = await ajax(
                     "http://192.168.0.91:8011/dh-executive-tracking/saveProgressFeedback",
@@ -174,7 +170,7 @@ export default {
                     "post"
                 );
                 console.log(res);
-                if (res.code === 200) {
+                if (res.code == 200) {
                     this.$Message.success("提交" + res.msg);
                     this.$router.push("/rlzz");
                 }
@@ -185,13 +181,37 @@ export default {
                     "post"
                 );
                 console.log(res)
+                 if (res.code == 200) {
+                    this.$Message.success("提交" + res.msg);
+                    this.$router.push("/rlzz");
+                }
             }
         },
         wjremove(file, filelist) {
-            console.log(file.name);
-            console.log(file.response.data.uploadDto.fileUrl)
+            console.log(file.response);
+            console.log(this.arr)
+            let arr=[];
+            
+            
+            // console.log(file.response.data.uploadDto.fileUrl)
+            let url="";
+            if(file.response){
+                console.log(file.response.data.uploadDto.fileUrl)
+                url=file.response.data.uploadDto.fileUrl;
+                for(let i=0;i<this.arr.length;i++){
+                if(file.response.data.uploadDto.fileUrl==this.arr[i].fileUrl){
+                    console.log(111)
+                }else{
+                   arr.push(this.arr[i]); 
+                }
+                this.arr=JSON.parse(JSON.stringify(arr))
+            }
+            }else{
+                console.log(file.url)
+                url=file.url;
+            }
             ajax("http://192.168.0.91:8011/ossservice/oss/delete",{
-                 fileUrl:file.response.data.uploadDto.fileUrl,
+                 fileUrl:url,
                  originalFilename:file.name
             },"post").then(res=>{
                 console.log(res)
@@ -221,6 +241,15 @@ export default {
          this.form.completionStatus=obj.Status;
          this.form.informationNote=obj.info;
          this.form.id =JSON.parse(sessionStorage.getItem("wenID"))
+         this.form2.detId=JSON.parse(sessionStorage.getItem("wenID"))
+         ajax(`http://192.168.0.91:8011//dh-executive-tracking/progressFeedbackEcho/${this.form2.detId}`).then(res=>{
+             console.log(res)
+             if(res.data.echo.attachments_name){
+                this.defaultList=res.data.echo.attachments_name;
+             }
+            //  console.log(res.data.echo.attachments_name)
+            
+         })
     },
     beforeUpdate() {}, //生命周期 - 更新之前
     updated() {}, //生命周期 - 更新之后

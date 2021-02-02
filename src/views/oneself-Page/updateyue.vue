@@ -78,10 +78,14 @@
                         <div class="updatab">
                             <Upload
                                 multiple
-                                action="http://192.168.0.91:8011/ossservice/oss/upload"
-                                
+                                action="http://192.168.0.90:8011/dh-annex-table/file"
+                                :default-file-list="filelist"
+                                :on-remove="remove"
+                                :on-success="sucess"
+                                :before-upload="bginupdata"
+                                :data="da"
                             >
-                                <Button icon="ios-cloud-upload-outline"
+                                <Button @click="btn" icon="ios-cloud-upload-outline"
                                     >上传附件</Button
                                 >
                             </Upload>
@@ -127,6 +131,12 @@ export default {
             arr:[],
             oldmeetingDate:"",
             oldreportName:"",
+            filelist:[],
+            da: {
+                meetingDate: "",
+                reportName: "",
+                token: "",
+            },
         };
     },
     //监听属性 类似于data概念
@@ -144,7 +154,17 @@ export default {
             console.log(reportName)
             let res=await ajax(`http://192.168.0.91:8011//dh-mreport/monthlyMeetingEcho/${meetingDate}/${reportName}`,{},"get");
             console.log(res.data.echo.children)
-            console.log(res.data.echo)
+            console.log(res.data.attachments)
+            if(res.data.attachments.length>0){
+                let arr=res.data.attachments;
+                arr.forEach(element => {
+                    let obj={
+                        name:element.attachmentsName,
+                        url:element.fileUrl
+                    }
+                    this.filelist.push(obj)
+                });
+            }
             this.form.meetingDate=res.data.echo.meetingDate;
             this.form.reportName=res.data.echo.reportName;
             this.form.titleName=res.data.echo.titleName;
@@ -198,7 +218,49 @@ export default {
         },
         getdate(date){
             this.form.meetingDate=date;
-        }
+        },
+         async remove(file,filelist){//文件删除操作
+        //    let id=file.id;
+           let res = await ajax(
+                "http://192.168.0.91:8011/ossservice/oss/delete",
+                {
+                    fileUrl:file.url,
+                   originalFilename:file.name
+                },
+                "post"
+            );
+            console.log(res)
+            this.filelist=filelist;
+        },
+        bginupdata(file) {
+            //上传文件之前的钩子函数
+            console.log(file);
+            let flag = true;
+            this.filelist.forEach((item) => {
+                if (item.name == file.name) {
+                    flag = false;
+                    this.$Notice.info({
+                        title: "系统提醒！",
+                        desc: "上传文件重复！请重新上传文件！",
+                    });
+                }
+            });
+            if (!flag) {
+                return false;
+            }
+        },
+       async sucess(req,file,filelist){
+             console.log(req)
+             console.log(file)
+             this.filelist=filelist;
+       },
+       btn(){
+          this.da={
+            meetingDate: this.form.meetingDate,
+            reportName: this.form.reportName,
+            token: sessionStorage.getItem("token"),
+          }
+       }
 
     },
     beforeCreate() {}, //生命周期 - 创建之前

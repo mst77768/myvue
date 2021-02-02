@@ -30,8 +30,8 @@
                     </Upload> -->
                     <h3>附件如下:</h3>
                     <p v-for="(item, index) in defaultList" :key="index">
-                        <a :href="item.value" :download="item.label">{{
-                            item.label
+                        <a :href="item.url" :download="item.name">{{
+                            item.name
                         }}</a>
                     </p>
                 </div>
@@ -122,14 +122,16 @@ export default {
         ).then((res) => {
             // console.log(res.data.echo.attachments_name);
             console.log(res.code);
+            this.defaultList  = res.data.echo.attachments_name;
+            console.log(this.defaultList)
             if (res.code == 201) {
                 this.$Message.warning(res.data.msg);
             } else {
-                let abb = [];
-                if (res.data.echo.attachments_name != null) {
-                    abb = res.data.echo.attachments_name;
-                }
-                console.log(abb);
+                // let abb = [];
+              
+                     
+                
+                // console.log(abb);
                 
                 this.models = res.data.echo.completionStatus;
                 let obj = {
@@ -139,7 +141,7 @@ export default {
                         : "无",
                 };
                 this.data1.push(obj);
-                this.defaultList = abb;
+               
             }
         });
         // this.models = ojb.completionStatus;
